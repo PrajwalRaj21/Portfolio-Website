@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Prajwol Raj Giri</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0d0e;
+  --s1:#121214;
+  --s2:#18181b;
+  --s3:#1f1f23;
+  --s4:#27272c;
+  --border:#2c2c32;
+  --border2:#383840;
+  --text:#eeebe3;
+  --t2:#9e9a92;
+  --t3:#5a5752;
+  --amber:#d4a843;
+  --a2:#f0c96a;
+  --abg:rgba(212,168,67,0.07);
+  --ab:rgba(212,168,67,0.18);
+  --red:#e05252;
+  --green:#4caf76;
+  --f:'Bricolage Grotesque',sans-serif;
+  --m:'IBM Plex Mono',monospace;
+  --r:13px;
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--text);font-family:var(--f);
+  min-height:100vh;overflow-x:hidden;
+  background-image:
+    radial-gradient(ellipse 60% 40% at 15% 0%,rgba(212,168,67,0.035) 0%,transparent 70%),
+    radial-gradient(ellipse 40% 30% at 85% 100%,rgba(212,168,67,0.02) 0%,transparent 60%);
+}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
+
+/* ── LAYOUT ── */
+.shell{display:grid;grid-template-columns:290px 1fr;min-height:100vh}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  background:var(--s1);border-right:1px solid var(--border);
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+  display:flex;flex-direction:column;padding:30px 22px 24px;
+}
+.av-wrap{
+  display:flex;flex-direction:column;align-items:center;
+  padding-bottom:22px;border-bottom:1px solid var(--border);margin-bottom:22px;
+}
+.av{
+  width:106px;height:106px;border-radius:20px;
+  background:var(--s3);border:2px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:44px;margin-bottom:14px;overflow:hidden;
+  box-shadow:0 0 0 4px rgba(212,168,67,0.06),0 12px 40px rgba(0,0,0,0.5);
+}
+.av img{width:100%;height:100%;object-fit:cover}
+.sname{font-size:1.15rem;font-weight:700;letter-spacing:-0.025em;text-align:center;margin-bottom:7px}
+.sbadge{
+  font-family:var(--m);font-size:0.62rem;letter-spacing:0.07em;
+  background:var(--abg);border:1px solid var(--ab);color:var(--amber);
+  padding:4px 13px;border-radius:99px;
+}
+.info-list{display:flex;flex-direction:column;gap:11px;margin-bottom:22px}
+.ir{display:flex;align-items:flex-start;gap:10px}
+.iico{
+  width:30px;height:30px;min-width:30px;background:var(--s2);
+  border:1px solid var(--border);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--amber);
+}
+.il{font-family:var(--m);font-size:0.56rem;color:var(--t3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:2px}
+.iv{font-size:0.77rem;color:var(--t2);line-height:1.35;word-break:break-all}
+.sid-div{height:1px;background:var(--border);margin:0 0 18px}
+.socials{display:flex;gap:6px}
+.soc{
+  flex:1;height:33px;background:var(--s2);border:1px solid var(--border);
+  border-radius:9px;display:flex;align-items:center;justify-content:center;
+  color:var(--t3);text-decoration:none;font-size:13px;transition:all 0.18s;
+}
+.soc:hover{border-color:var(--amber);color:var(--amber);background:var(--abg)}
+
+/* ── MAIN ── */
+.main{display:flex;flex-direction:column}
+.topbar{
+  position:sticky;top:0;z-index:50;
+  background:rgba(13,13,14,0.82);backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--border);
+  padding:13px 36px;display:flex;align-items:center;justify-content:space-between;
+}
+.npills{display:flex;gap:2px;background:var(--s2);padding:4px;border-radius:11px;border:1px solid var(--border)}
+.nb{
+  background:none;border:none;color:var(--t2);cursor:pointer;
+  font-family:var(--f);font-size:0.79rem;font-weight:500;
+  padding:6px 17px;border-radius:8px;transition:all 0.18s;
+  text-decoration:none;display:inline-block;
+}
+.nb:hover{color:var(--text)}
+.nb.on{background:var(--s3);color:var(--amber);font-weight:600}
+.avail-pill{
+  display:flex;align-items:center;gap:6px;
+  font-family:var(--m);font-size:0.62rem;color:var(--t3);
+  background:var(--s2);border:1px solid var(--border);
+  padding:5px 12px;border-radius:99px;
+}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--green);
+  box-shadow:0 0 0 0 rgba(76,175,118,0.5);animation:ping 2.5s infinite}
+@keyframes ping{
+  0%,100%{box-shadow:0 0 0 0 rgba(76,175,118,0.5)}
+  50%{box-shadow:0 0 0 5px rgba(76,175,118,0)}
+}
+
+/* CONTENT — scrollable */
+.content{padding:0;flex:1;max-width:100%;overflow-y:auto;height:calc(100vh - 49px)}
+.sec{padding:40px 36px}
+.sec-div{height:1px;background:var(--border);margin:0 36px}
+
+.ph{font-size:2rem;font-weight:800;letter-spacing:-0.04em;margin-bottom:5px}
+.pu{width:34px;height:3px;background:var(--amber);border-radius:99px;margin-bottom:30px}
+
+/* ── ABOUT ── */
+.abio{font-size:0.92rem;line-height:1.9;color:var(--t2);max-width:100%;margin-bottom:14px}
+.abio strong{color:var(--text);font-weight:600}
+.wt{font-size:0.95rem;font-weight:700;letter-spacing:-0.02em;margin:32px 0 14px;color:var(--text)}
+.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:11px}
+.sc{
+  background:var(--s1);border:1px solid var(--border);border-radius:var(--r);
+  padding:18px;transition:border-color 0.2s,transform 0.2s;
+}
+.sc:hover{border-color:var(--border2);transform:translateY(-2px)}
+.si{font-size:18px;margin-bottom:9px}
+.sn{font-size:0.86rem;font-weight:600;margin-bottom:4px}
+.sd{font-size:0.74rem;color:var(--t2);line-height:1.75}
+
+/* ── RESUME ── */
+.rs{margin-bottom:28px}
+.rsh{
+  font-family:var(--m);font-size:0.6rem;color:var(--amber);
+  letter-spacing:0.14em;text-transform:uppercase;
+  display:flex;align-items:center;gap:10px;margin-bottom:12px;
+}
+.rsh::after{content:'';flex:1;height:1px;background:var(--border)}
+.rc{
+  background:var(--s1);border:1px solid var(--border);border-radius:var(--r);
+  padding:16px 18px;margin-bottom:8px;transition:border-color 0.15s;
+}
+.rc:hover{border-color:var(--border2)}
+.rtop{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:3px}
+.rtitle{font-size:0.88rem;font-weight:600}
+.rperiod{
+  font-family:var(--m);font-size:0.62rem;color:var(--amber);
+  background:var(--abg);border:1px solid var(--ab);
+  padding:3px 9px;border-radius:99px;white-space:nowrap;
+}
+.rsub{font-family:var(--m);font-size:0.7rem;color:var(--a2);margin-bottom:6px}
+.rdesc{font-size:0.75rem;color:var(--t2);line-height:1.75}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+.chip{
+  font-family:var(--m);font-size:0.6rem;padding:3px 9px;
+  background:var(--s2);border:1px solid var(--border);border-radius:99px;color:var(--t2);
+  transition:all 0.15s;
+}
+.chip:hover{border-color:var(--amber);color:var(--amber)}
+
+/* ── PORTFOLIO ── */
+.pt{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:20px}
+.frow{display:flex;gap:5px;flex-wrap:wrap}
+.fb{
+  background:none;border:1px solid var(--border);color:var(--t3);cursor:pointer;
+  font-family:var(--f);font-size:0.73rem;padding:5px 13px;border-radius:99px;
+  transition:all 0.18s;
+}
+.fb:hover{border-color:var(--t2);color:var(--text)}
+.fb.on{background:var(--abg);border-color:var(--amber);color:var(--amber);font-weight:600}
+.pcnt{font-family:var(--m);font-size:0.67rem;color:var(--t3)}
+
+.pgrid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(258px,1fr));
+  gap:13px;
+}
+.pcard{
+  background:var(--s1);border:1px solid var(--border);border-radius:15px;
+  overflow:hidden;cursor:pointer;
+  transition:transform 0.22s cubic-bezier(.2,.8,.4,1),border-color 0.22s,box-shadow 0.22s;
+  display:flex;flex-direction:column;
+}
+.pcard:hover{transform:translateY(-5px);border-color:var(--border2);box-shadow:0 20px 50px rgba(0,0,0,0.4)}
+.ptb{
+  width:100%;aspect-ratio:16/9;background:var(--s3);
+  overflow:hidden;position:relative;
+  display:flex;align-items:center;justify-content:center;
+}
+.ptb img{width:100%;height:100%;object-fit:cover;transition:transform 0.4s}
+.pcard:hover .ptb img{transform:scale(1.07)}
+.ptbph{
+  width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+  font-size:30px;
+  background:linear-gradient(135deg,var(--s2) 0%,var(--s3) 100%);
+}
+.ptbov{
+  position:absolute;inset:0;background:rgba(0,0,0,0);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:background 0.25s;
+}
+.pcard:hover .ptbov{background:rgba(0,0,0,0.58)}
+.povbtn{
+  background:rgba(255,255,255,0.92);border:none;color:#0d0d0e;cursor:pointer;
+  font-family:var(--f);font-size:0.7rem;font-weight:700;
+  padding:6px 14px;border-radius:7px;
+  opacity:0;transform:translateY(8px);transition:all 0.22s;
+  text-decoration:none;display:flex;align-items:center;gap:4px;
+}
+.pcard:hover .povbtn{opacity:1;transform:translateY(0)}
+.povbtn:hover{background:var(--amber)}
+.pin{padding:14px 14px 13px;flex:1;display:flex;flex-direction:column;gap:4px}
+.pcat{font-family:var(--m);font-size:0.61rem;color:var(--amber);letter-spacing:0.04em}
+.ptitle{font-size:0.89rem;font-weight:700;line-height:1.2;letter-spacing:-0.01em}
+.pdesc{font-size:0.73rem;color:var(--t2);line-height:1.7;margin-top:2px}
+.ptags{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px}
+.ptag{
+  font-family:var(--m);font-size:0.57rem;padding:2px 7px;
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:99px;color:var(--t3);
+}
+.plks{display:flex;gap:8px;margin-top:9px;padding-top:9px;border-top:1px solid var(--border)}
+.plk{
+  font-family:var(--m);font-size:0.63rem;color:var(--t3);
+  text-decoration:none;display:flex;align-items:center;gap:4px;
+  transition:color 0.15s;
+}
+.plk:hover{color:var(--a2)}
+.fempty{
+  grid-column:1/-1;
+  background:var(--s1);border:1.5px dashed var(--border2);border-radius:16px;
+  padding:54px 20px;text-align:center;
+}
+.fei{font-size:36px;margin-bottom:12px;opacity:0.4}
+.fet{font-size:0.86rem;font-weight:600;color:var(--t2);margin-bottom:5px}
+.fed{font-family:var(--m);font-size:0.7rem;color:var(--t3)}
+
+/* ── CONTACT ── */
+.cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:11px;margin-bottom:24px}
+.ccard{
+  background:var(--s1);border:1px solid var(--border);border-radius:var(--r);
+  padding:16px;display:flex;gap:13px;align-items:center;transition:border-color 0.18s;
+}
+.ccard:hover{border-color:var(--border2)}
+.cico{
+  width:36px;height:36px;min-width:36px;background:var(--abg);
+  border:1px solid var(--ab);border-radius:9px;
+  display:flex;align-items:center;justify-content:center;font-size:14px;
+}
+.cl{font-family:var(--m);font-size:0.56rem;color:var(--t3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px}
+.cv{font-size:0.8rem;font-weight:500;word-break:break-all}
+.cform{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:26px}
+.cfh{font-size:0.95rem;font-weight:700;letter-spacing:-0.02em;margin-bottom:18px}
+.frow2{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:11px}
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:11px}
+.fl{font-family:var(--m);font-size:0.58rem;color:var(--t3);text-transform:uppercase;letter-spacing:0.1em}
+.fi,.fta{
+  background:var(--s2);border:1px solid var(--border);color:var(--text);
+  padding:9px 12px;border-radius:9px;font-family:var(--f);font-size:0.82rem;
+  outline:none;transition:border-color 0.18s;resize:none;
+}
+.fi:focus,.fta:focus{border-color:var(--amber)}
+.fta{height:96px}
+.sbtn{
+  background:var(--amber);color:#0d0d0e;border:none;cursor:pointer;
+  font-family:var(--f);font-weight:700;font-size:0.8rem;
+  padding:10px 24px;border-radius:9px;
+  transition:opacity 0.18s,transform 0.15s;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.sbtn:hover{opacity:0.84;transform:translateY(-1px)}
+
+/* ── PROJECT DRAWER ── */
+.dov{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.72);
+  z-index:200;align-items:flex-end;justify-content:center;
+  backdrop-filter:blur(5px);
+}
+.dov.on{display:flex}
+.drawer{
+  background:var(--s1);border:1px solid var(--border2);
+  border-radius:20px 20px 0 0;width:100%;max-width:680px;
+  max-height:88vh;overflow-y:auto;padding:26px;
+  animation:sup 0.28s cubic-bezier(.2,.8,.4,1);
+}
+@keyframes sup{from{transform:translateY(50px);opacity:0}to{transform:translateY(0);opacity:1}}
+.dcl{
+  float:right;background:var(--s3);border:1px solid var(--border2);
+  color:var(--t2);cursor:pointer;width:28px;height:28px;
+  border-radius:7px;font-size:13px;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.15s;
+}
+.dcl:hover{border-color:var(--red);color:var(--red)}
+.dthumb{
+  width:100%;aspect-ratio:16/7;background:var(--s3);border-radius:12px;
+  overflow:hidden;margin:14px 0 18px;
+  display:flex;align-items:center;justify-content:center;font-size:52px;opacity:0.4;
+}
+.dthumb img{width:100%;height:100%;object-fit:cover;opacity:1}
+.dcat{font-family:var(--m);font-size:0.62rem;color:var(--amber);letter-spacing:0.05em;margin-bottom:5px}
+.dtitle{font-size:1.5rem;font-weight:800;letter-spacing:-0.03em;margin-bottom:11px}
+.ddesc{font-size:0.83rem;color:var(--t2);line-height:1.88;margin-bottom:14px}
+.dlks{display:flex;gap:9px;margin-top:14px}
+.dlk{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--m);font-size:0.7rem;padding:8px 17px;border-radius:9px;
+  text-decoration:none;font-weight:500;transition:all 0.18s;
+}
+.dlk-p{background:var(--amber);color:#0d0d0e}
+.dlk-p:hover{opacity:0.84}
+.dlk-s{background:var(--s3);border:1px solid var(--border2);color:var(--t2)}
+.dlk-s:hover{border-color:var(--amber);color:var(--amber)}
+
+/* ── MODALS ── */
+.mo{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.76);
+  z-index:300;align-items:center;justify-content:center;
+  backdrop-filter:blur(7px);padding:16px;
+}
+.mo.on{display:flex}
+.mbox{
+  background:var(--s1);border:1px solid var(--border2);border-radius:18px;
+  width:100%;max-width:560px;max-height:91vh;overflow-y:auto;
+  padding:26px;animation:scin 0.2s ease;
+}
+.mbox::-webkit-scrollbar{width:4px}
+.mbox::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
+@keyframes scin{from{opacity:0;transform:scale(0.97) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.mh{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
+.mt{font-size:1rem;font-weight:700;letter-spacing:-0.02em}
+.mcl{
+  background:var(--s3);border:1px solid var(--border2);color:var(--t2);
+  cursor:pointer;width:28px;height:28px;border-radius:7px;font-size:13px;
+  display:flex;align-items:center;justify-content:center;transition:all 0.15s;
+}
+.mcl:hover{border-color:var(--red);color:var(--red)}
+.lnote{font-family:var(--m);font-size:0.68rem;color:var(--t3);margin-bottom:14px}
+.lerr{font-family:var(--m);font-size:0.7rem;color:var(--red);margin-top:5px;display:none}
+
+/* ADMIN TABS */
+.atabs{display:flex;gap:3px;background:var(--s2);padding:4px;border-radius:10px;margin-bottom:20px;border:1px solid var(--border)}
+.at{
+  flex:1;background:none;border:none;color:var(--t3);cursor:pointer;
+  font-family:var(--f);font-size:0.73rem;font-weight:500;
+  padding:7px 8px;border-radius:7px;transition:all 0.18s;
+}
+.at:hover{color:var(--text)}
+.at.on{background:var(--s3);color:var(--amber);font-weight:600}
+.ap{display:none}.ap.on{display:block}
+
+/* ADD FORM */
+.aform{display:flex;flex-direction:column;gap:10px}
+.aform .fg{margin:0}
+.aform .frow2{margin:0}
+.abtn{
+  background:var(--amber);color:#0d0d0e;border:none;cursor:pointer;
+  font-family:var(--f);font-weight:700;font-size:0.78rem;
+  padding:9px 20px;border-radius:9px;
+  display:inline-flex;align-items:center;gap:5px;
+  transition:opacity 0.18s;
+}
+.abtn:hover{opacity:0.84}
+.abtn-ghost{background:var(--s3);color:var(--t2);border:1px solid var(--border2)}
+.abtn-ghost:hover{color:var(--text);opacity:1}
+.abtn-danger{background:rgba(224,82,82,0.1);border:1px solid rgba(224,82,82,0.28);color:var(--red)}
+.abtn-danger:hover{background:rgba(224,82,82,0.2);opacity:1}
+.smsg{font-family:var(--m);font-size:0.68rem;color:var(--green);display:none}
+.emsg{font-family:var(--m);font-size:0.68rem;color:var(--red);display:none}
+
+/* MANAGE */
+.alist{display:flex;flex-direction:column;gap:6px}
+.aitem{
+  background:var(--s2);border:1px solid var(--border);border-radius:10px;
+  padding:11px 13px;display:flex;align-items:center;gap:11px;
+  transition:border-color 0.15s;
+}
+.aitem:hover{border-color:var(--border2)}
+.ath{
+  width:42px;height:30px;min-width:42px;background:var(--s3);
+  border-radius:6px;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--t3);
+}
+.ath img{width:100%;height:100%;object-fit:cover}
+.ai{flex:1;min-width:0}
+.ait{font-size:0.82rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.aic{font-family:var(--m);font-size:0.6rem;color:var(--t3)}
+.aac{display:flex;gap:5px;flex-shrink:0}
+.aab{
+  background:var(--s3);border:1px solid var(--border2);color:var(--t3);
+  cursor:pointer;font-family:var(--f);font-size:0.66rem;
+  padding:5px 9px;border-radius:6px;transition:all 0.15s;
+}
+.aab:hover{border-color:var(--t2);color:var(--text)}
+.aab-del{color:var(--red)}
+.aab-del:hover{border-color:var(--red);background:rgba(224,82,82,0.1);color:var(--red)}
+.er{
+  background:var(--s3);border:1px solid var(--border2);border-radius:9px;
+  padding:13px;margin-top:5px;display:none;
+}
+.er.on{display:block}
+.egrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:7px}
+.eact{display:flex;gap:7px;margin-top:7px}
+
+/* STATS */
+.strow{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:16px}
+.stc{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
+.stn{font-size:1.55rem;font-weight:800;color:var(--amber);letter-spacing:-0.04em}
+.stl{font-family:var(--m);font-size:0.58rem;color:var(--t3);text-transform:uppercase;letter-spacing:0.08em;margin-top:2px}
+.bar-item{margin-bottom:9px}
+.bar-top{display:flex;justify-content:space-between;margin-bottom:4px}
+.bar-n{font-size:0.76rem}
+.bar-c{font-family:var(--m);font-size:0.65rem;color:var(--t3)}
+.bar-track{height:5px;background:var(--s3);border-radius:99px;overflow:hidden}
+.bar-fill{height:100%;background:linear-gradient(90deg,var(--amber),var(--a2));border-radius:99px;transition:width 0.7s ease}
+
+/* PW */
+.pwrap{display:flex;flex-direction:column;gap:9px}
+.dzone{margin-top:18px;padding-top:16px;border-top:1px solid var(--border)}
+.dzl{font-family:var(--m);font-size:0.58rem;color:var(--t3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:9px}
+
+/* RESPONSIVE */
+@media(max-width:860px){
+  .shell{grid-template-columns:240px 1fr}
+  .sec{padding:28px 22px}
+  .sec-div{margin:0 22px}
+  .topbar{padding:11px 22px}
+}
+@media(max-width:650px){
+  .shell{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  .sidebar{position:relative;height:auto;flex-direction:row;flex-wrap:wrap;padding:18px;gap:14px;align-items:flex-start}
+  .av-wrap{flex-direction:row;gap:14px;align-items:flex-start;border-bottom:none;padding-bottom:0;margin-bottom:0}
+  .av{width:74px;height:74px;font-size:30px;margin:0}
+  .info-list{display:none}
+  .sid-div{display:none}
+  .socials{margin-top:0}
+  .topbar{padding:10px 14px}
+  .nb{padding:5px 10px;font-size:0.71rem}
+  .content{height:auto;overflow-y:visible}
+  .sec{padding:20px 16px}
+  .sec-div{margin:0 16px}
+  .sg{grid-template-columns:1fr}
+  .cg{grid-template-columns:1fr}
+  .frow2{grid-template-columns:1fr}
+  .strow{grid-template-columns:1fr 1fr}
+  .egrid{grid-template-columns:1fr}
+  .pgrid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:400px){.pgrid{grid-template-columns:1fr}}
+/* RESUME GENERATOR SPINNER */
+.rspinner{
+  width:32px;height:32px;border-radius:50%;
+  border:2.5px solid var(--border2);
+  border-top-color:var(--amber);
+  animation:spin 0.7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* PRINT RESUME STYLES */
+@media print{
+  body>*{display:none!important}
+  #printResumePage{display:block!important;position:fixed;inset:0;z-index:99999;background:#fff}
+}
+#printResumePage{display:none}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="av-wrap">
+    <div class="av"><span>👤</span></div>
+    <div>
+      <div class="sname">Prajwol Raj Giri</div>
+      <div class="sbadge" style="display:inline-block;margin-top:6px">Data &amp; GTM Engineer</div>
+    </div>
+  </div>
+  <div class="info-list">
+    <div class="ir"><div class="iico">✉</div><div><div class="il">Email</div><div class="iv">prajwol@prajwolraj.com.np</div></div></div>
+    <div class="ir"><div class="iico">📱</div><div><div class="il">Phone</div><div class="iv">+977 9842749417</div></div></div>
+    <div class="ir"><div class="iico">🗓</div><div><div class="il">Birthday</div><div class="iv">Nov 2, 2002</div></div></div>
+    <div class="ir"><div class="iico">📍</div><div><div class="il">Location</div><div class="iv">Lalitpur, Bagmati, Nepal</div></div></div>
+  </div>
+  <div class="sid-div"></div>
+  <div class="socials">
+    <a class="soc" href="https://github.com/PrajwalRaj21" target="_blank" title="GitHub">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+    </a>
+    <a class="soc" href="https://linkedin.com/in/rprmcf1" target="_blank" title="LinkedIn">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+    </a>
+    <a class="soc" href="mailto:prajwol@prajwolraj.com.np" title="Email">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+    </a>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <nav class="topbar">
+    <div class="npills">
+      <a class="nb on" href="#s-about" onclick="setActive(this)">About</a>
+      <a class="nb" href="#s-resume" onclick="setActive(this)">Resume</a>
+      <a class="nb" href="#s-portfolio" onclick="setActive(this)">Portfolio</a>
+      <a class="nb" href="#s-contact" onclick="setActive(this)">Contact</a>
+    </div>
+    <div class="avail-pill"><span class="dot"></span>Available for work</div>
+  </nav>
+
+  <div class="content">
+
+    <!-- ABOUT -->
+    <section id="s-about" class="sec">
+      <div class="ph">About Me</div><div class="pu"></div>
+      <p class="abio">Hi, I'm <strong>Prajwol Raj Giri</strong> — a Computer Engineering student based in Lalitpur, Nepal with a strong focus on <strong>data engineering</strong>, <strong>machine learning</strong>, and <strong>go-to-market (GTM) systems</strong>. I enjoy working at the intersection of data and business, building pipelines and intelligent systems that create real impact.</p>
+      <p class="abio">My expertise spans designing ETL pipelines, cloud data platforms, and big data tools like <strong>Python, SQL, PySpark, and Databricks</strong>. I've also worked in GTM engineering — automating and integrating sales and marketing workflows to help revenue teams move faster. Alongside this, I build and deploy ML models for computer vision, recommendation systems, and predictive analytics.</p>
+      <div class="wt">What I Do</div>
+      <div class="sg">
+        <div class="sc"><div class="si">🗄</div><div class="sn">Database Management</div><div class="sd">Designing efficient, scalable, and secure database systems with optimised schemas, queries, and performance tuning for real-world applications.</div></div>
+        <div class="sc"><div class="si">⚙️</div><div class="sn">Data Engineering</div><div class="sd">Building reliable data pipelines and transforming raw data into structured insights using Python, SQL, Spark, and cloud platforms.</div></div>
+        <div class="sc"><div class="si">🤖</div><div class="sn">AI / ML Engineering</div><div class="sd">Developing intelligent machine learning and deep learning solutions for computer vision, prediction, and recommendation systems.</div></div>
+        <div class="sc"><div class="si">📈</div><div class="sn">GTM Engineering</div><div class="sd">Automating go-to-market workflows — from CRM integrations and enrichment pipelines to RevOps tooling that accelerates revenue teams.</div></div>
+      </div>
+    </section>
+
+    <div class="sec-div"></div>
+
+    <!-- RESUME -->
+    <section id="s-resume" class="sec">
+      <div class="ph">Resume</div><div class="pu"></div>
+      <div class="rs">
+        <div class="rsh">Education</div>
+        <div class="rc"><div class="rtop"><div class="rtitle">Bachelor in Computer Engineering</div><div class="rperiod">2022 — 2026</div></div><div class="rsub">Tribhuvan University · Lalitpur, Nepal</div><div class="rdesc">Focusing on data systems, machine learning, and software engineering. Active in research and project-based learning.</div></div>
+        <div class="rc"><div class="rtop"><div class="rtitle">+2 Science (HSEB)</div><div class="rperiod">2019 — 2021</div></div><div class="rsub">Lalitpur, Nepal</div></div>
+      </div>
+      <div class="rs">
+        <div class="rsh">Experience</div>
+        <div class="rc"><div class="rtop"><div class="rtitle">Data &amp; GTM Engineer</div><div class="rperiod">2025 — Present</div></div><div class="rsub">Freelance / Contract</div><div class="rdesc">Building ETL pipelines, data lakehouse architectures on Databricks and AWS, and GTM automation workflows. Delivering end-to-end data solutions across analytics and sales ops.</div></div>
+      </div>
+      <div class="rs">
+        <div class="rsh">Technical Skills</div>
+        <div class="rc"><div class="chips"><span class="chip">Python</span><span class="chip">SQL</span><span class="chip">PySpark</span><span class="chip">JavaScript</span><span class="chip">Bash</span><span class="chip">R</span><span class="chip">Databricks</span><span class="chip">Apache Spark</span><span class="chip">AWS S3</span><span class="chip">AWS Glue</span><span class="chip">PostgreSQL</span><span class="chip">MongoDB</span><span class="chip">dbt</span><span class="chip">Airflow</span><span class="chip">Pandas</span><span class="chip">NumPy</span><span class="chip">Scikit-learn</span><span class="chip">TensorFlow</span><span class="chip">HubSpot</span><span class="chip">Salesforce</span><span class="chip">n8n</span><span class="chip">Git</span><span class="chip">Docker</span><span class="chip">Linux</span></div></div>
+      </div>
+    </section>
+
+    <div class="sec-div"></div>
+
+    <!-- PORTFOLIO -->
+    <section id="s-portfolio" class="sec">
+      <div class="ph">Portfolio</div><div class="pu"></div>
+      <div class="pt">
+        <div class="frow" id="frow"><button class="fb on" onclick="filterBy('All',this)">All</button></div>
+        <div class="pcnt" id="pcnt"></div>
+      </div>
+      <div class="pgrid" id="pgrid"></div>
+    </section>
+
+    <div class="sec-div"></div>
+
+    <!-- CONTACT -->
+    <section id="s-contact" class="sec">
+      <div class="ph">Contact</div><div class="pu"></div>
+      <div class="cg">
+        <div class="ccard"><div class="cico">✉</div><div><div class="cl">Email</div><div class="cv">prajwol@prajwolraj.com.np</div></div></div>
+        <div class="ccard"><div class="cico">📱</div><div><div class="cl">Phone</div><div class="cv">+977 9842749417</div></div></div>
+        <div class="ccard"><div class="cico">📍</div><div><div class="cl">Location</div><div class="cv">Lalitpur, Bagmati, Nepal</div></div></div>
+        <div class="ccard"><div class="cico">🌐</div><div><div class="cl">Website</div><div class="cv">prajwolraj.com.np</div></div></div>
+      </div>
+      <div class="cform">
+        <div class="cfh">Send a Message</div>
+        <div class="frow2"><div class="fg"><label class="fl">Full Name</label><input class="fi" type="text" placeholder="Your name"></div><div class="fg"><label class="fl">Email</label><input class="fi" type="email" placeholder="your@email.com"></div></div>
+        <div class="fg"><label class="fl">Subject</label><input class="fi" type="text" placeholder="What's this about?"></div>
+        <div class="fg"><label class="fl">Message</label><textarea class="fta" placeholder="Tell me about your project..."></textarea></div>
+        <button class="sbtn">Send Message →</button>
+      </div>
+    </section>
+
+    <div style="height:48px"></div>
+
+  </div>
+</div>
+</div>
+
+<!-- HIDDEN ADMIN TRIGGER: invisible corner hotspot + Ctrl+Shift+A -->
+<div id="secretSpot" onclick="openAdmin()" title="" style="
+  position:fixed;bottom:0;right:0;width:28px;height:28px;
+  z-index:100;cursor:default;opacity:0;
+"></div>
+
+<!-- DRAWER -->
+<div class="dov" id="dov" onclick="if(event.target===this)this.classList.remove('on')">
+  <div class="drawer">
+    <button class="dcl" onclick="document.getElementById('dov').classList.remove('on')">✕</button>
+    <div id="dbody"></div>
+  </div>
+</div>
+
+<!-- LOGIN MODAL -->
+<div class="mo" id="lmo">
+  <div class="mbox">
+    <div class="mh"><div class="mt">Admin Login</div><button class="mcl" onclick="closeMo('lmo')">✕</button></div>
+    <div class="lnote">Enter your admin password to manage projects.</div>
+    <div class="fg"><label class="fl">Password</label><input class="fi" id="pwin" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div class="lerr" id="lerr">Incorrect password.</div>
+    <button class="sbtn" style="margin-top:13px;width:100%;justify-content:center" onclick="doLogin()">Login</button>
+  </div>
+</div>
+
+<!-- ADMIN MODAL -->
+<div class="mo" id="amo">
+  <div class="mbox">
+    <div class="mh"><div class="mt">⚙ Project Manager</div><button class="mcl" onclick="closeMo('amo')">✕</button></div>
+    <div class="atabs">
+      <button class="at on" onclick="aTab('add',this)">＋ Add</button>
+      <button class="at" onclick="aTab('manage',this)">Manage</button>
+      <button class="at" onclick="aTab('stats',this)">Stats</button>
+      <button class="at" onclick="aTab('resume',this)">✨ Resume</button>
+      <button class="at" onclick="aTab('settings',this)">Settings</button>
+    </div>
+
+    <!-- ADD -->
+    <div class="ap on" id="ap-add">
+      <div class="aform">
+        <div class="frow2" style="margin:0"><div class="fg"><label class="fl">Title *</label><input class="fi" id="aT" placeholder="e.g. Space Tracker"></div><div class="fg"><label class="fl">Category *</label><input class="fi" id="aC" placeholder="e.g. Python Projects"></div></div>
+        <div class="fg"><label class="fl">Description</label><textarea class="fta" id="aD" placeholder="Brief project description..." style="height:76px"></textarea></div>
+        <div class="frow2" style="margin:0"><div class="fg"><label class="fl">Tags (comma separated)</label><input class="fi" id="aTg" placeholder="Python, SQL, ETL"></div><div class="fg"><label class="fl">Year</label><input class="fi" id="aYr" placeholder="e.g. 2025"></div></div>
+        <div class="frow2" style="margin:0"><div class="fg"><label class="fl">Thumbnail URL</label><input class="fi" id="aI" placeholder="https://..."></div><div class="fg"><label class="fl">Live URL</label><input class="fi" id="aLv" placeholder="https://..."></div></div>
+        <div class="frow2" style="margin:0"><div class="fg"><label class="fl">GitHub URL</label><input class="fi" id="aGh" placeholder="https://github.com/..."></div><div class="fg"></div></div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <button class="abtn" onclick="addProject()">＋ Add Project</button>
+          <div class="smsg" id="addok">✓ Added!</div>
+          <div class="emsg" id="adderr">Title &amp; Category required.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MANAGE -->
+    <div class="ap" id="ap-manage">
+      <div class="alist" id="alist"></div>
+    </div>
+
+    <!-- STATS -->
+    <div class="ap" id="ap-stats">
+      <div class="strow" id="strow"></div>
+      <div id="catbars"></div>
+    </div>
+
+    <!-- RESUME GENERATOR -->
+    <div class="ap" id="ap-resume">
+      <div style="background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:13px 15px;margin-bottom:16px">
+        <div style="font-size:0.78rem;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:7px">
+          <span style="font-size:14px">⚡</span> Powered by Groq — Free &amp; Fast
+        </div>
+        <div style="font-size:0.73rem;color:var(--t2);line-height:1.65">
+          Get a free API key at <a href="https://console.groq.com" target="_blank" style="color:var(--amber);text-decoration:none;font-family:var(--m)">console.groq.com</a> → sign up → API Keys → Create key. Paste it below. It's stored only in your browser.
+        </div>
+      </div>
+      <div class="fg" style="position:relative">
+        <label class="fl">Groq API Key</label>
+        <div style="position:relative">
+          <input class="fi" id="rApiKey" type="password" placeholder="gsk_…" style="width:100%;padding-right:80px"
+            oninput="saveGroqKey(this.value)">
+          <button onclick="toggleKeyVis()" style="
+            position:absolute;right:8px;top:50%;transform:translateY(-50%);
+            background:var(--s3);border:1px solid var(--border2);color:var(--t3);
+            cursor:pointer;font-family:var(--m);font-size:0.6rem;
+            padding:3px 9px;border-radius:6px;transition:all 0.15s;
+          " id="keyToggleBtn">show</button>
+        </div>
+        <div id="keyStatus" style="font-family:var(--m);font-size:0.62rem;color:var(--green);margin-top:4px;display:none">✓ Key saved</div>
+      </div>
+      <div class="fg"><label class="fl">Target Job Title</label><input class="fi" id="rjob" placeholder="e.g. Data Engineer, ML Engineer, GTM Engineer…"></div>
+      <div class="fg"><label class="fl">Extra context <span style="color:var(--t3)">(optional)</span></label><input class="fi" id="rctx" placeholder="e.g. startup, fintech, Databricks stack, remote…"></div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+        <button class="abtn" id="rgenBtn" onclick="generateResume()">✨ Generate Resume</button>
+        <div class="smsg" id="rgenMsg" style="display:none"></div>
+      </div>
+      <!-- loading -->
+      <div id="rloading" style="display:none;padding:28px 0;text-align:center">
+        <div style="display:inline-flex;flex-direction:column;align-items:center;gap:12px">
+          <div class="rspinner"></div>
+          <div style="font-family:var(--m);font-size:0.7rem;color:var(--t3)" id="rloadmsg">Scanning your projects…</div>
+        </div>
+      </div>
+      <!-- generated confirmation + open preview button -->
+      <div id="rpreview" style="display:none">
+        <div style="background:var(--s2);border:1px solid var(--border2);border-radius:11px;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+          <div>
+            <div style="font-size:0.85rem;font-weight:600;margin-bottom:3px">Resume ready ✓</div>
+            <div style="font-family:var(--m);font-size:0.65rem;color:var(--t3)" id="rjoblabel"></div>
+          </div>
+          <div style="display:flex;gap:7px;flex-wrap:wrap">
+            <button class="abtn" style="font-size:0.75rem;padding:8px 16px" onclick="openResumePreview()">👁 Preview &amp; Download</button>
+            <button class="abtn abtn-ghost" style="font-size:0.75rem;padding:8px 14px" onclick="document.getElementById('rpreview').style.display='none';document.getElementById('rgenBtn').textContent='✨ Generate Resume'">✕</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="ap" id="ap-settings">
+      <div style="font-size:0.79rem;color:var(--t2);margin-bottom:14px">Change your admin password below.</div>
+      <div class="pwrap">
+        <div class="fg"><label class="fl">Current Password</label><input class="fi" id="cp" type="password" placeholder="••••••••"></div>
+        <div class="fg"><label class="fl">New Password</label><input class="fi" id="np" type="password" placeholder="••••••••"></div>
+        <div class="fg"><label class="fl">Confirm New Password</label><input class="fi" id="cnp" type="password" placeholder="••••••••"></div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <button class="abtn" onclick="changePw()">Update Password</button>
+          <div class="smsg" id="pwok">✓ Updated!</div>
+          <div class="emsg" id="pwerr">Check passwords and try again.</div>
+        </div>
+      </div>
+      <div class="dzone"><div class="dzl">Danger Zone</div><button class="abtn abtn-danger" onclick="clearAll()">🗑 Delete All Projects</button></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SK='prg3_projects',PK='prg3_pw',DP='prajwol2024';
+let loggedIn=false,curCat='All';
+
+const getP=()=>{try{return JSON.parse(localStorage.getItem(SK))||[]}catch{return[]}};
+const setP=d=>localStorage.setItem(SK,JSON.stringify(d));
+const getPw=()=>localStorage.getItem(PK)||DP;
+
+// NAV — highlight active link on click & scroll
+function setActive(el){
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+}
+
+// Scroll-spy: update active nav as user scrolls
+const content = document.querySelector('.content');
+const sections = ['s-about','s-resume','s-portfolio','s-contact'];
+content.addEventListener('scroll', () => {
+  let current = sections[0];
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el.offsetTop - 80 <= content.scrollTop) current = id;
+  });
+  document.querySelectorAll('.nb').forEach(b => {
+    b.classList.toggle('on', b.getAttribute('href') === '#' + current);
+  });
+});
+
+// Smooth scroll on nav click (content div scrolls, not window)
+document.querySelectorAll('.nb[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.getElementById(a.getAttribute('href').slice(1));
+    if (target) content.scrollTo({ top: target.offsetTop - 0, behavior: 'smooth' });
+  });
+});
+
+// PORTFOLIO
+const emo=cat=>{
+  const m={'python':'🐍','eda':'📊','databricks':'⚡','etl':'🔧','machine':'🤖','gtm':'📈','web':'🌐','sql':'🗄','nlp':'💬','analytics':'📉','ml':'🤖','ai':'🤖','stock':'📊','price':'💰','space':'🚀'};
+  const lc=(cat||'').toLowerCase();
+  for(const k in m)if(lc.includes(k))return m[k];
+  return'📁';
+};
+
+function buildFilters(){
+  const ps=getP();
+  const cats=['All',...new Set(ps.map(p=>p.cat).filter(Boolean))];
+  document.getElementById('frow').innerHTML=cats.map(c=>
+    `<button class="fb${c===curCat?' on':''}" onclick="filterBy('${c.replace(/'/g,"\\'")}',this)">${c}</button>`
+  ).join('');
+}
+
+function filterBy(cat,btn){
+  curCat=cat;
+  document.querySelectorAll('.fb').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderPortfolio();
+}
+
+function renderPortfolio(){
+  const all=getP();
+  const list=curCat==='All'?all:all.filter(p=>p.cat===curCat);
+  const grid=document.getElementById('pgrid');
+  document.getElementById('pcnt').textContent=list.length+' project'+(list.length!==1?'s':'');
+  if(!list.length){
+    grid.innerHTML=`<div class="fempty"><div class="fei">${curCat==='All'?'🗂':'🔍'}</div><div class="fet">${curCat==='All'?'No projects yet':'No projects in this category'}</div><div class="fed">Click ⚙ bottom-right to add projects</div></div>`;
+    return;
+  }
+  const ghSvg=`<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>`;
+  grid.innerHTML=list.map(p=>`
+    <div class="pcard" onclick="openDrawer(${p.id})">
+      <div class="ptb">
+        ${p.img?`<img src="${p.img}" alt="${p.title}" onerror="this.parentElement.innerHTML='<div class=\\'ptbph\\'>${emo(p.cat)}</div>'">`:`<div class="ptbph">${emo(p.cat)}</div>`}
+        <div class="ptbov">
+          <span class="povbtn">👁 Details</span>
+          ${p.live?`<a class="povbtn" href="${p.live}" target="_blank" onclick="event.stopPropagation()">↗ Live</a>`:''}
+        </div>
+      </div>
+      <div class="pin">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:6px">
+          <div class="pcat">${p.cat||''}</div>
+          ${p.year?`<div style="font-family:var(--m);font-size:0.6rem;color:var(--t3)">${p.year}</div>`:''}
+        </div>
+        <div class="ptitle">${p.title}</div>
+        ${p.desc?`<div class="pdesc">${p.desc.length>95?p.desc.slice(0,95)+'…':p.desc}</div>`:''}
+        ${p.tags&&p.tags.length?`<div class="ptags">${p.tags.slice(0,4).map(t=>`<span class="ptag">${t}</span>`).join('')}${p.tags.length>4?`<span class="ptag">+${p.tags.length-4}</span>`:''}</div>`:''}
+        ${(p.live||p.gh)?`<div class="plks">
+          ${p.live?`<a class="plk" href="${p.live}" target="_blank" onclick="event.stopPropagation()">↗ Live</a>`:''}
+          ${p.gh?`<a class="plk" href="${p.gh}" target="_blank" onclick="event.stopPropagation()">${ghSvg} GitHub</a>`:''}
+        </div>`:''}
+      </div>
+    </div>`).join('');
+}
+
+// DRAWER
+function openDrawer(id){
+  const p=getP().find(x=>x.id===id);if(!p)return;
+  const e=emo(p.cat);
+  const ghSvg=`<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>`;
+  document.getElementById('dbody').innerHTML=`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+      <div class="dcat">${p.cat||'Project'}</div>
+      ${p.year?`<div style="font-family:var(--m);font-size:0.65rem;color:var(--t3)">· ${p.year}</div>`:''}
+    </div>
+    <div class="dtitle">${p.title}</div>
+    ${p.tags&&p.tags.length?`<div class="chips" style="margin-bottom:12px">${p.tags.map(t=>`<span class="chip">${t}</span>`).join('')}</div>`:''}
+    <div class="dthumb">${p.img?`<img src="${p.img}" alt="${p.title}">`:`${e}`}</div>
+    <div class="ddesc">${p.desc||'No description provided.'}</div>
+    ${(p.live||p.gh)?`<div class="dlks">
+      ${p.live?`<a class="dlk dlk-p" href="${p.live}" target="_blank">↗ View Live</a>`:''}
+      ${p.gh?`<a class="dlk dlk-s" href="${p.gh}" target="_blank">${ghSvg} GitHub</a>`:''}
+    </div>`:''}`;
+  document.getElementById('dov').classList.add('on');
+}
+
+// ADMIN
+function openAdmin(){
+  if(loggedIn){openPanel()}
+  else{document.getElementById('lmo').classList.add('on');setTimeout(()=>document.getElementById('pwin').focus(),80)}
+}
+
+// Secret keyboard shortcut: Ctrl + Shift + A
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey && e.shiftKey && e.key === 'A') openAdmin();
+});
+function doLogin(){
+  if(document.getElementById('pwin').value===getPw()){
+    loggedIn=true;document.getElementById('lerr').style.display='none';
+    document.getElementById('pwin').value='';
+    closeMo('lmo');openPanel();
+  }else{document.getElementById('lerr').style.display='block'}
+}
+function openPanel(){
+  document.querySelectorAll('.at')[0].click();
+  document.getElementById('amo').classList.add('on');
+}
+function closeMo(id){document.getElementById(id).classList.remove('on')}
+document.querySelectorAll('.mo').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('on')}));
+
+function aTab(id,btn){
+  document.querySelectorAll('.at').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.ap').forEach(p=>p.classList.remove('on'));
+  btn.classList.add('on');document.getElementById('ap-'+id).classList.add('on');
+  if(id==='manage')renderAList();
+  if(id==='stats')renderStats();
+  if(id==='resume')loadGroqKey();
+}
+
+// ADD
+function addProject(){
+  const t=document.getElementById('aT').value.trim();
+  const c=document.getElementById('aC').value.trim();
+  if(!t||!c){
+    const e=document.getElementById('adderr');e.style.display='block';
+    setTimeout(()=>e.style.display='none',2500);return;
+  }
+  const raw=document.getElementById('aTg').value.trim();
+  const p={id:Date.now(),title:t,cat:c,
+    desc:document.getElementById('aD').value.trim(),
+    tags:raw?raw.split(',').map(s=>s.trim()).filter(Boolean):[],
+    year:document.getElementById('aYr').value.trim(),
+    img:document.getElementById('aI').value.trim(),
+    live:document.getElementById('aLv').value.trim(),
+    gh:document.getElementById('aGh').value.trim()};
+  const all=getP();all.unshift(p);setP(all);
+  ['aT','aC','aD','aTg','aYr','aI','aLv','aGh'].forEach(i=>document.getElementById(i).value='');
+  const ok=document.getElementById('addok');ok.style.display='block';
+  setTimeout(()=>ok.style.display='none',2500);
+  buildFilters();renderPortfolio();
+}
+
+// MANAGE LIST
+function renderAList(){
+  const all=getP();
+  const el=document.getElementById('alist');
+  if(!all.length){el.innerHTML='<div style="color:var(--t3);font-family:var(--m);font-size:0.73rem;padding:14px 0">No projects yet. Add one from the Add tab.</div>';return}
+  el.innerHTML=all.map(p=>`
+    <div id="ai-${p.id}">
+      <div class="aitem">
+        <div class="ath">${p.img?`<img src="${p.img}" alt="" onerror="this.parentElement.textContent='${emo(p.cat)}'">`:`${emo(p.cat)}`}</div>
+        <div class="ai"><div class="ait">${p.title}</div><div class="aic">${p.cat}</div></div>
+        <div class="aac">
+          <button class="aab" onclick="toggleEdit(${p.id})">✏</button>
+          <button class="aab aab-del" onclick="delProj(${p.id})">✕</button>
+        </div>
+      </div>
+      <div class="er" id="er-${p.id}">
+        <div class="egrid">
+          <div class="fg"><label class="fl">Title</label><input class="fi" id="et-${p.id}" value="${p.title.replace(/"/g,'&quot;')}"></div>
+          <div class="fg"><label class="fl">Category</label><input class="fi" id="ec-${p.id}" value="${(p.cat||'').replace(/"/g,'&quot;')}"></div>
+          <div class="fg"><label class="fl">Year</label><input class="fi" id="eyr-${p.id}" value="${p.year||''}"></div>
+          <div class="fg"><label class="fl">Tags</label><input class="fi" id="etg-${p.id}" value="${(p.tags||[]).join(', ')}"></div>
+          <div class="fg"><label class="fl">Thumbnail URL</label><input class="fi" id="ei-${p.id}" value="${(p.img||'').replace(/"/g,'&quot;')}"></div>
+          <div class="fg"><label class="fl">Live URL</label><input class="fi" id="el-${p.id}" value="${(p.live||'').replace(/"/g,'&quot;')}"></div>
+          <div class="fg"><label class="fl">GitHub URL</label><input class="fi" id="eg-${p.id}" value="${(p.gh||'').replace(/"/g,'&quot;')}"></div>
+        </div>
+        <div class="fg"><label class="fl">Description</label><textarea class="fta" id="ed-${p.id}" style="height:68px">${p.desc||''}</textarea></div>
+        <div class="eact">
+          <button class="abtn" onclick="saveEdit(${p.id})">✓ Save</button>
+          <button class="abtn abtn-ghost" onclick="toggleEdit(${p.id})">Cancel</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+function toggleEdit(id){document.getElementById('er-'+id).classList.toggle('on')}
+function saveEdit(id){
+  const all=getP();const i=all.findIndex(p=>p.id===id);if(i<0)return;
+  const raw=document.getElementById('etg-'+id).value.trim();
+  all[i]={...all[i],
+    title:document.getElementById('et-'+id).value.trim(),
+    cat:document.getElementById('ec-'+id).value.trim(),
+    desc:document.getElementById('ed-'+id).value.trim(),
+    tags:raw?raw.split(',').map(s=>s.trim()).filter(Boolean):[],
+    year:document.getElementById('eyr-'+id).value.trim(),
+    img:document.getElementById('ei-'+id).value.trim(),
+    live:document.getElementById('el-'+id).value.trim(),
+    gh:document.getElementById('eg-'+id).value.trim()};
+  setP(all);renderAList();buildFilters();renderPortfolio();
+}
+function delProj(id){
+  if(!confirm('Delete this project?'))return;
+  setP(getP().filter(p=>p.id!==id));renderAList();buildFilters();renderPortfolio();
+}
+
+// STATS
+function renderStats(){
+  const all=getP();
+  const cats=[...new Set(all.map(p=>p.cat).filter(Boolean))];
+  document.getElementById('strow').innerHTML=`
+    <div class="stc"><div class="stn">${all.length}</div><div class="stl">Projects</div></div>
+    <div class="stc"><div class="stn">${cats.length}</div><div class="stl">Categories</div></div>
+    <div class="stc"><div class="stn">${all.filter(p=>p.live||p.gh).length}</div><div class="stl">With Links</div></div>`;
+  if(!all.length){document.getElementById('catbars').innerHTML='';return}
+  const max=Math.max(...cats.map(c=>all.filter(p=>p.cat===c).length));
+  document.getElementById('catbars').innerHTML=`
+    <div class="rsh" style="margin-top:14px">By Category</div>
+    ${cats.map(c=>{const n=all.filter(p=>p.cat===c).length;return`
+      <div class="bar-item">
+        <div class="bar-top"><span class="bar-n">${c}</span><span class="bar-c">${n} project${n!==1?'s':''}</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${Math.round(n/max*100)}%"></div></div>
+      </div>`}).join('')}`;
+}
+
+// PASSWORD
+function changePw(){
+  const cur=document.getElementById('cp').value;
+  const nw=document.getElementById('np').value;
+  const cf=document.getElementById('cnp').value;
+  const ok=document.getElementById('pwok');const err=document.getElementById('pwerr');
+  if(cur!==getPw()||!nw||nw!==cf){
+    err.style.display='block';ok.style.display='none';
+    setTimeout(()=>err.style.display='none',2500);return;
+  }
+  localStorage.setItem(PK,nw);ok.style.display='block';err.style.display='none';
+  ['cp','np','cnp'].forEach(i=>document.getElementById(i).value='');
+  setTimeout(()=>ok.style.display='none',2500);
+}
+function clearAll(){
+  if(!confirm('Delete ALL projects? Cannot be undone.'))return;
+  setP([]);buildFilters();renderPortfolio();renderAList();
+}
+
+// SEED
+(function(){
+  if(getP().length)return;
+  setP([
+    {id:1,title:'Space Tracker',cat:'Python Projects',desc:'Personal expense tracking dashboard built with Python and Plotly Dash, featuring budget breakdowns, category analysis, and monthly spending trends with interactive charts.',tags:['Python','Dash','Plotly','Pandas'],img:'',live:'',gh:'https://github.com/prajwalraj21'},
+    {id:2,title:'Car Performance & Price Analysis',cat:'EDA',desc:'Exploratory data analysis on a large car dataset uncovering relationships between engine specs, performance metrics, and pricing. Rich visual storytelling with Seaborn and Matplotlib.',tags:['Python','Seaborn','Matplotlib','EDA'],img:'',live:'',gh:'https://github.com/prajwalraj21'},
+    {id:3,title:'Price Inflator Tracker',cat:'Databricks ETL Pipeline',desc:'End-to-end ETL pipeline on Databricks ingesting raw pricing data, applying business transformations, and writing inflation analytics to a Delta Lake table with automated scheduling.',tags:['Databricks','PySpark','SQL','Delta Lake'],img:'',live:'',gh:'https://github.com/prajwalraj21'},
+    {id:4,title:'Databricks S3 ETL Lakehouse',cat:'Databricks ETL Pipeline',desc:'Production-grade data lakehouse architecture combining Databricks, AWS S3, and Delta Lake. Features automated incremental ingestion, schema evolution, and data quality checks.',tags:['AWS S3','Delta Lake','PySpark','Glue'],img:'',live:'',gh:'https://github.com/prajwalraj21'},
+    {id:5,title:'Databricks S3 Stock Update ETL',cat:'Databricks ETL Pipeline',desc:'Real-time stock data ingestion pipeline using Alpha Vantage API with automated Databricks Workflows scheduling and Slack alerting on pipeline failures.',tags:['Databricks','AWS','Python','Alpha Vantage'],img:'',live:'',gh:'https://github.com/prajwalraj21'},
+  ]);
+})();
+
+buildFilters();renderPortfolio();
+</script>
+<!-- FULLSCREEN RESUME PREVIEW MODAL -->
+<div id="resumePreviewMo" style="
+  display:none;position:fixed;inset:0;z-index:500;
+  background:rgba(5,5,6,0.92);backdrop-filter:blur(8px);
+  flex-direction:column;
+">
+  <!-- toolbar -->
+  <div style="
+    flex-shrink:0;display:flex;align-items:center;justify-content:space-between;
+    padding:12px 20px;background:rgba(18,18,20,0.95);border-bottom:1px solid var(--border2);
+    backdrop-filter:blur(10px);
+  ">
+    <div style="display:flex;align-items:center;gap:14px">
+      <div>
+        <div style="font-size:0.88rem;font-weight:700;letter-spacing:-0.02em" id="prevTitle">Resume Preview</div>
+        <div style="font-family:var(--m);font-size:0.6rem;color:var(--t3)" id="prevSub"></div>
+      </div>
+      <!-- zoom controls -->
+      <div style="display:flex;align-items:center;gap:4px;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:3px">
+        <button onclick="changeZoom(-10)" style="background:none;border:none;color:var(--t2);cursor:pointer;width:28px;height:26px;border-radius:5px;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all 0.15s" onmouseover="this.style.background='var(--s3)'" onmouseout="this.style.background='none'">−</button>
+        <span id="zoomLabel" style="font-family:var(--m);font-size:0.65rem;color:var(--t2);min-width:36px;text-align:center">100%</span>
+        <button onclick="changeZoom(10)" style="background:none;border:none;color:var(--t2);cursor:pointer;width:28px;height:26px;border-radius:5px;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all 0.15s" onmouseover="this.style.background='var(--s3)'" onmouseout="this.style.background='none'">＋</button>
+        <button onclick="resetZoom()" style="background:none;border:none;color:var(--t3);cursor:pointer;width:28px;height:26px;border-radius:5px;font-size:10px;font-family:var(--m);display:flex;align-items:center;justify-content:center;transition:all 0.15s" onmouseover="this.style.background='var(--s3)'" onmouseout="this.style.background='none'" title="Reset zoom">⊡</button>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button onclick="printResume()" style="
+        background:var(--amber);color:#0d0d0e;border:none;cursor:pointer;
+        font-family:var(--f);font-weight:700;font-size:0.78rem;
+        padding:8px 18px;border-radius:9px;
+        display:flex;align-items:center;gap:6px;transition:opacity 0.18s;
+      " onmouseover="this.style.opacity='0.84'" onmouseout="this.style.opacity='1'">
+        🖨 Print / Save PDF
+      </button>
+      <button onclick="closeResumePreview()" style="
+        background:var(--s2);border:1px solid var(--border2);color:var(--t2);
+        cursor:pointer;font-family:var(--f);font-size:0.78rem;font-weight:500;
+        padding:8px 14px;border-radius:9px;transition:all 0.15s;
+        display:flex;align-items:center;gap:5px;
+      " onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--t2)'">
+        ✕ Close
+      </button>
+    </div>
+  </div>
+
+  <!-- page canvas -->
+  <div id="resumeCanvas" style="
+    flex:1;overflow:auto;padding:32px 24px 48px;
+    display:flex;justify-content:center;align-items:flex-start;
+  ">
+    <div id="resumePageWrap" style="transition:transform 0.2s ease;transform-origin:top center">
+      <!-- A4 page shadow -->
+      <div style="
+        width:794px;min-height:1123px;
+        background:#ffffff;
+        box-shadow:0 4px 6px rgba(0,0,0,0.1),0 20px 60px rgba(0,0,0,0.5),0 0 0 1px rgba(255,255,255,0.04);
+        border-radius:3px;
+        position:relative;
+        overflow:hidden;
+      ">
+        <div id="resumePageContent"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PRINT RESUME CONTAINER -->
+<div id="printResumePage" style="display:none"></div>
+
+<script>
+// ── RESUME GENERATOR ──
+const LOAD_MSGS = [
+  'Scanning your projects…',
+  'Matching skills to role…',
+  'Crafting bullet points…',
+  'Building your resume…',
+  'Polishing the layout…',
+];
+
+let _resumeZoom = 100;
+
+// ── GROQ KEY HELPERS ──
+function saveGroqKey(val) {
+  localStorage.setItem('prg_groq_key', val.trim());
+  const s = document.getElementById('keyStatus');
+  s.style.display = val.trim() ? 'block' : 'none';
+}
+function toggleKeyVis() {
+  const inp = document.getElementById('rApiKey');
+  const btn = document.getElementById('keyToggleBtn');
+  const isHidden = inp.type === 'password';
+  inp.type = isHidden ? 'text' : 'password';
+  btn.textContent = isHidden ? 'hide' : 'show';
+}
+// Load saved key on tab open
+function loadGroqKey() {
+  const saved = localStorage.getItem('prg_groq_key') || '';
+  const inp = document.getElementById('rApiKey');
+  if (inp && saved) {
+    inp.value = saved;
+    document.getElementById('keyStatus').style.display = 'block';
+  }
+}
+
+async function generateResume() {
+  const job = document.getElementById('rjob').value.trim();
+  if (!job) {
+    const btn = document.getElementById('rgenBtn');
+    btn.textContent = '⚠ Enter a job title first';
+    setTimeout(() => btn.textContent = '✨ Generate Resume', 1800);
+    return;
+  }
+
+  const projects = getP();
+  const ctx = document.getElementById('rctx').value.trim();
+
+  document.getElementById('rloading').style.display = 'block';
+  document.getElementById('rpreview').style.display = 'none';
+  document.getElementById('rgenBtn').disabled = true;
+  document.getElementById('rgenBtn').textContent = '⏳ Generating…';
+
+  let mi = 0;
+  const loadEl = document.getElementById('rloadmsg');
+  loadEl.textContent = LOAD_MSGS[0];
+  const interval = setInterval(() => { mi = (mi + 1) % LOAD_MSGS.length; loadEl.textContent = LOAD_MSGS[mi]; }, 1800);
+
+  const projectsText = projects.length
+    ? projects.map(p => `Project: ${p.title}\nCategory: ${p.cat}\nTags: ${(p.tags||[]).join(', ')}\nDescription: ${p.desc||'N/A'}`).join('\n\n')
+    : 'No projects available.';
+
+  const prompt = `You are a professional resume writer. Generate a clean, modern, single-page HTML resume for Prajwol Raj Giri tailored specifically for the role: "${job}"${ctx ? ` (context: ${ctx})` : ''}.
+
+PERSONAL INFO:
+- Name: Prajwol Raj Giri
+- Title: Data & GTM Engineer
+- Email: prajwol@prajwolraj.com.np
+- Phone: +977 9842749417
+- Location: Lalitpur, Bagmati, Nepal
+- GitHub: github.com/PrajwalRaj21
+- Website: prajwolraj.com.np
+
+EDUCATION:
+- Bachelor in Computer Engineering, Tribhuvan University, 2022–2026
+- +2 Science (HSEB), 2019–2021
+
+EXPERIENCE:
+- Data & GTM Engineer, Freelance/Contract, 2025–Present. Building ETL pipelines, data lakehouse architectures on Databricks and AWS, and GTM automation workflows.
+
+SKILLS: Python, SQL, PySpark, JavaScript, Databricks, Apache Spark, AWS S3, AWS Glue, PostgreSQL, MongoDB, dbt, Airflow, Pandas, NumPy, Scikit-learn, TensorFlow, HubSpot, Salesforce, n8n, Git, Docker, Linux
+
+ALL PROJECTS:
+${projectsText}
+
+INSTRUCTIONS:
+1. Select only the 3-4 most relevant projects for the "${job}" role. Write 1-2 impactful bullet points per project using strong action verbs.
+2. Write a 2-sentence professional summary tailored to the role.
+3. Pick only the most relevant skills (8-12 max) for this specific role.
+4. Output ONLY raw HTML with inline CSS. No markdown, no code fences, no explanation.
+5. The HTML must be a complete self-contained resume body — no <html>/<head>/<body> tags, just the resume content div.
+6. Style it as a minimalist, elegant single-page resume. Use this exact style:
+   - Font: 'Inter', sans-serif (import from Google Fonts in a <style> tag inside the output)
+   - Background: #ffffff, color: #1a1a1a
+   - Name: 24px bold, border-bottom: 2px solid #1a1a1a, padding-bottom: 10px, margin-bottom: 6px
+   - Contact line: 11px, color: #555, comma-separated on one line
+   - Section headers: 9px, font-weight:700, text-transform:uppercase, letter-spacing:0.12em, color:#888, border-bottom:1px solid #e8e8e8, padding-bottom:4px, margin:20px 0 10px
+   - Body text: 12px, line-height:1.65, color:#1a1a1a
+   - Project/job titles: 12.5px font-weight:600
+   - Dates: float right, 11px, color:#888
+   - Bullet points: margin-left:16px, margin-top:4px, font-size:11.5px, color:#333
+   - Skills: inline-flex flex-wrap gap:5px; each skill: font-size:10.5px, background:#f2f2f2, padding:3px 9px, border-radius:3px, color:#333
+   - Wrapper: max-width:794px, margin:0, padding:44px 52px, box-sizing:border-box
+   - No colors except black/grey. No icons. Pure typographic hierarchy.
+7. Include @media print { body { margin:0; } } in the style block.`;
+
+  try {
+    const apiKey = (localStorage.getItem('prg_groq_key') || '').trim();
+    if (!apiKey) {
+      clearInterval(interval);
+      document.getElementById('rloading').style.display = 'none';
+      document.getElementById('rgenBtn').disabled = false;
+      document.getElementById('rgenBtn').textContent = '✨ Generate Resume';
+      const msg = document.getElementById('rgenMsg');
+      msg.style.display = 'block';
+      msg.style.color = 'var(--red)';
+      msg.textContent = '✕ Please enter your Groq API key first.';
+      setTimeout(() => msg.style.display = 'none', 3500);
+      return;
+    }
+
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        max_tokens: 3000,
+        temperature: 0.4,
+        messages: [
+          { role: 'system', content: 'You are a professional resume writer. Output only raw HTML with inline CSS — no markdown, no code fences, no explanation whatsoever.' },
+          { role: 'user', content: prompt }
+        ]
+      })
+    });
+
+    clearInterval(interval);
+    const data = await res.json();
+
+    if (data.error) throw new Error(data.error.message || 'Groq API error');
+
+    const html = data.choices?.[0]?.message?.content || '';
+    const clean = html.replace(/```html?/gi, '').replace(/```/g, '').trim();
+
+    window._resumeHTML = clean;
+    window._resumeJob = job;
+
+    document.getElementById('rloading').style.display = 'none';
+    document.getElementById('rpreview').style.display = 'block';
+    document.getElementById('rjoblabel').textContent = `Tailored for: ${job}`;
+    document.getElementById('rgenBtn').disabled = false;
+    document.getElementById('rgenBtn').textContent = '✨ Regenerate';
+
+  } catch (err) {
+    clearInterval(interval);
+    document.getElementById('rloading').style.display = 'none';
+    document.getElementById('rgenBtn').disabled = false;
+    document.getElementById('rgenBtn').textContent = '✨ Generate Resume';
+    const msg = document.getElementById('rgenMsg');
+    msg.style.display = 'block';
+    msg.style.color = 'var(--red)';
+    msg.textContent = '✕ Generation failed. Try again.';
+    console.error(err);
+    setTimeout(() => msg.style.display = 'none', 3000);
+  }
+}
+
+// ── PREVIEW MODAL ──
+function openResumePreview() {
+  if (!window._resumeHTML) return;
+  document.getElementById('resumePageContent').innerHTML = window._resumeHTML;
+  document.getElementById('prevTitle').textContent = 'Resume Preview';
+  document.getElementById('prevSub').textContent = `Tailored for: ${window._resumeJob || ''}`;
+  _resumeZoom = 100;
+  applyZoom();
+  const mo = document.getElementById('resumePreviewMo');
+  mo.style.display = 'flex';
+  // Auto-fit zoom to viewport width
+  const canvas = document.getElementById('resumeCanvas');
+  const availW = canvas.clientWidth - 48;
+  if (availW < 794) {
+    _resumeZoom = Math.floor((availW / 794) * 100);
+    applyZoom();
+  }
+  document.body.style.overflow = 'hidden';
+}
+
+function closeResumePreview() {
+  document.getElementById('resumePreviewMo').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function changeZoom(delta) {
+  _resumeZoom = Math.min(150, Math.max(40, _resumeZoom + delta));
+  applyZoom();
+}
+
+function resetZoom() {
+  _resumeZoom = 100;
+  applyZoom();
+}
+
+function applyZoom() {
+  const scale = _resumeZoom / 100;
+  const wrap = document.getElementById('resumePageWrap');
+  wrap.style.transform = `scale(${scale})`;
+  // Shrink the canvas height accordingly so scroll works properly
+  wrap.style.marginBottom = `${(1 - scale) * 1123 * scale}px`;
+  document.getElementById('zoomLabel').textContent = _resumeZoom + '%';
+}
+
+// Close preview on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.getElementById('resumePreviewMo').style.display === 'flex') {
+    closeResumePreview();
+  }
+});
+
+function printResume() {
+  if (!window._resumeHTML) return;
+  const printDiv = document.getElementById('printResumePage');
+  printDiv.innerHTML = window._resumeHTML;
+  printDiv.style.display = 'block';
+  setTimeout(() => {
+    window.print();
+    setTimeout(() => { printDiv.style.display = 'none'; }, 600);
+  }, 120);
+}
+</script>
+</body>
+</html>
