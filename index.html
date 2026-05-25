@@ -744,10 +744,14 @@ const SK='prg3_projects',PK='prg3_pw',DP='prajwol2024';
 const SB_URL_KEY='prg_sb_url', SB_KEY_KEY='prg_sb_key';
 let loggedIn=false,curCat='All';
 
+// ── HARDCODED SUPABASE CONFIG (safe to commit — anon key only) ──
+const SB_URL_DEFAULT='https://huhinvhseftmooirehuw.supabase.co';
+const SB_KEY_DEFAULT='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1aGludmhzZWZ0bW9vaXJlaHV3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2OTY0ODAsImV4cCI6MjA5NTI3MjQ4MH0._lOUbPQOyKbZ6WJk8FbvaXDpVKz5ROmM7MTR7EleKvg';
+
 // ── SUPABASE CONFIG ──
-const getSbUrl=()=>localStorage.getItem(SB_URL_KEY)||'';
-const getSbKey=()=>localStorage.getItem(SB_KEY_KEY)||'';
-const isSupaReady=()=>!!(getSbUrl()&&getSbKey());
+const getSbUrl=()=>localStorage.getItem(SB_URL_KEY)||SB_URL_DEFAULT;
+const getSbKey=()=>localStorage.getItem(SB_KEY_KEY)||SB_KEY_DEFAULT;
+const isSupaReady=()=>!!(getSbUrl()&&getSbKey()&&getSbKey()!=='PASTE_YOUR_ANON_KEY_HERE');
 
 function saveSupaCfg(){
   localStorage.setItem(SB_URL_KEY,document.getElementById('sbUrl').value.trim());
@@ -1096,18 +1100,7 @@ async function clearAll(){
 }
 
 
-// SEED (only into localStorage if no Supabase configured)
-(async function(){
-  if(isSupaReady())return; // don't seed if DB connected
-  if(getLocal().length)return;
-  setLocal([
-    {id:1,title:'Space Tracker',cat:'Python Projects',year:'2025',desc:'Personal expense tracking dashboard built with Python and Plotly Dash, featuring budget breakdowns, category analysis, and monthly spending trends with interactive charts.',tags:['Python','Dash','Plotly','Pandas'],img:'',live:'',gh:'https://github.com/PrajwalRaj21'},
-    {id:2,title:'Car Performance & Price Analysis',cat:'EDA',year:'2025',desc:'Exploratory data analysis on a large car dataset uncovering relationships between engine specs, performance metrics, and pricing. Rich visual storytelling with Seaborn and Matplotlib.',tags:['Python','Seaborn','Matplotlib','EDA'],img:'',live:'',gh:'https://github.com/PrajwalRaj21'},
-    {id:3,title:'Price Inflator Tracker',cat:'Databricks ETL Pipeline',year:'2025',desc:'End-to-end ETL pipeline on Databricks ingesting raw pricing data, applying business transformations, and writing inflation analytics to a Delta Lake table with automated scheduling.',tags:['Databricks','PySpark','SQL','Delta Lake'],img:'',live:'',gh:'https://github.com/PrajwalRaj21'},
-    {id:4,title:'Databricks S3 ETL Lakehouse',cat:'Databricks ETL Pipeline',year:'2026',desc:'Production-grade data lakehouse architecture combining Databricks, AWS S3, and Delta Lake. Features automated incremental ingestion, schema evolution, and data quality checks.',tags:['AWS S3','Delta Lake','PySpark','Glue'],img:'',live:'',gh:'https://github.com/PrajwalRaj21'},
-    {id:5,title:'Databricks S3 Stock Update ETL',cat:'Databricks ETL Pipeline',year:'2026',desc:'Real-time stock data ingestion pipeline using Alpha Vantage API with automated Databricks Workflows scheduling and Slack alerting on pipeline failures.',tags:['Databricks','AWS','Python','Alpha Vantage'],img:'',live:'',gh:'https://github.com/PrajwalRaj21'},
-  ]);
-})();
+// No seed — always fetch from Supabase if configured, else show empty
 
 function aTab(id,btn){
   document.querySelectorAll('.at').forEach(b=>b.classList.remove('on'));
