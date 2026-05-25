@@ -638,7 +638,7 @@ body{
         <div class="frow2" style="margin:0"><div class="fg"><label class="fl">Thumbnail URL</label><input class="fi" id="aI" placeholder="https://..."></div><div class="fg"><label class="fl">Live URL</label><input class="fi" id="aLv" placeholder="https://..."></div></div>
         <div class="frow2" style="margin:0"><div class="fg"><label class="fl">GitHub URL</label><input class="fi" id="aGh" placeholder="https://github.com/..."></div><div class="fg"></div></div>
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-          <button class="abtn" onclick="addProject()">＋ Add Project</button>
+          <button class="abtn" id="addProjectBtn" onclick="addProject()">＋ Add Project</button>
           <div class="smsg" id="addok">✓ Added!</div>
           <div class="emsg" id="adderr">Title &amp; Category required.</div>
         </div>
@@ -710,7 +710,20 @@ body{
 
     <!-- SETTINGS -->
     <div class="ap" id="ap-settings">
-      <div style="font-size:0.79rem;color:var(--t2);margin-bottom:14px">Change your admin password below.</div>
+      <!-- Supabase config -->
+      <div style="font-size:0.82rem;font-weight:600;margin-bottom:4px">🗄 Supabase Database</div>
+      <div style="font-size:0.75rem;color:var(--t2);margin-bottom:12px;line-height:1.6">Connect a free Supabase database so your projects persist everywhere. Get your URL &amp; key from <a href="https://supabase.com" target="_blank" style="color:var(--amber);text-decoration:none">supabase.com</a> → Settings → API.</div>
+      <div class="pwrap" style="margin-bottom:0">
+        <div class="fg"><label class="fl">Supabase Project URL</label><input class="fi" id="sbUrl" placeholder="https://xxxx.supabase.co" oninput="saveSupaCfg()"></div>
+        <div class="fg"><label class="fl">Supabase Anon Key</label><input class="fi" id="sbKey" type="password" placeholder="eyJh…" oninput="saveSupaCfg()"></div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <button class="abtn" onclick="testSupabase()">🔌 Test Connection</button>
+          <div class="smsg" id="supaOk">✓ Connected!</div>
+          <div class="emsg" id="supaErr">Connection failed. Check URL &amp; key.</div>
+        </div>
+      </div>
+      <div class="sid-div" style="margin:18px 0"></div>
+      <div style="font-size:0.79rem;color:var(--t2);margin-bottom:14px">Change your admin password.</div>
       <div class="pwrap">
         <div class="fg"><label class="fl">Current Password</label><input class="fi" id="cp" type="password" placeholder="••••••••"></div>
         <div class="fg"><label class="fl">New Password</label><input class="fi" id="np" type="password" placeholder="••••••••"></div>
@@ -728,11 +741,101 @@ body{
 
 <script>
 const SK='prg3_projects',PK='prg3_pw',DP='prajwol2024';
+const SB_URL_KEY='prg_sb_url', SB_KEY_KEY='prg_sb_key';
 let loggedIn=false,curCat='All';
 
-const getP=()=>{try{return JSON.parse(localStorage.getItem(SK))||[]}catch{return[]}};
-const setP=d=>localStorage.setItem(SK,JSON.stringify(d));
+// ── SUPABASE CONFIG ──
+const getSbUrl=()=>localStorage.getItem(SB_URL_KEY)||'';
+const getSbKey=()=>localStorage.getItem(SB_KEY_KEY)||'';
+const isSupaReady=()=>!!(getSbUrl()&&getSbKey());
+
+function saveSupaCfg(){
+  localStorage.setItem(SB_URL_KEY,document.getElementById('sbUrl').value.trim());
+  localStorage.setItem(SB_KEY_KEY,document.getElementById('sbKey').value.trim());
+}
+function loadSupaCfg(){
+  const u=document.getElementById('sbUrl');
+  const k=document.getElementById('sbKey');
+  if(u)u.value=getSbUrl();
+  if(k)k.value=getSbKey();
+}
+async function testSupabase(){
+  const ok=document.getElementById('supaOk');
+  const err=document.getElementById('supaErr');
+  ok.style.display='none';err.style.display='none';
+  if(!isSupaReady()){err.style.display='block';err.textContent='Enter URL and key first.';return;}
+  try{
+    const r=await sbFetch('GET','projects?limit=1');
+    if(r.ok){ok.style.display='block';setTimeout(()=>ok.style.display='none',2500);}
+    else throw new Error();
+  }catch{err.style.display='block';setTimeout(()=>err.style.display='none',3000);}
+}
+
+// ── SUPABASE REST HELPER ──
+async function sbFetch(method,path,body){
+  const url=`${getSbUrl()}/rest/v1/${path}`;
+  const headers={
+    'apikey':getSbKey(),
+    'Authorization':`Bearer ${getSbKey()}`,
+    'Content-Type':'application/json',
+    'Prefer': method==='POST'?'return=representation':'',
+  };
+  const opts={method,headers};
+  if(body)opts.body=JSON.stringify(body);
+  return fetch(url,opts);
+}
+
+// ── STORAGE API (Supabase if ready, else localStorage) ──
 const getPw=()=>localStorage.getItem(PK)||DP;
+
+// local fallback
+const getLocal=()=>{try{return JSON.parse(localStorage.getItem(SK))||[]}catch{return[]}};
+const setLocal=d=>localStorage.setItem(SK,JSON.stringify(d));
+
+async function getP(){
+  if(!isSupaReady())return getLocal();
+  try{
+    const r=await sbFetch('GET','projects?order=created_at.desc');
+    if(!r.ok)throw new Error();
+    const rows=await r.json();
+    return rows.map(row=>({
+      id:row.id,title:row.title,cat:row.cat,
+      desc:row.description,tags:row.tags?row.tags.split(',').filter(Boolean):[],
+      year:row.year||'',img:row.img||'',live:row.live||'',gh:row.gh||''
+    }));
+  }catch{return getLocal();}
+}
+
+async function addToDb(p){
+  if(!isSupaReady()){const all=getLocal();all.unshift(p);setLocal(all);return;}
+  await sbFetch('POST','projects',{
+    id:p.id,title:p.title,cat:p.cat,description:p.desc,
+    tags:(p.tags||[]).join(','),year:p.year||'',
+    img:p.img||'',live:p.live||'',gh:p.gh||''
+  });
+}
+
+async function updateInDb(p){
+  if(!isSupaReady()){
+    const all=getLocal();const i=all.findIndex(x=>x.id===p.id);
+    if(i>=0){all[i]=p;setLocal(all);}return;
+  }
+  await sbFetch('PATCH',`projects?id=eq.${p.id}`,{
+    title:p.title,cat:p.cat,description:p.desc,
+    tags:(p.tags||[]).join(','),year:p.year||'',
+    img:p.img||'',live:p.live||'',gh:p.gh||''
+  });
+}
+
+async function deleteFromDb(id){
+  if(!isSupaReady()){setLocal(getLocal().filter(p=>p.id!==id));return;}
+  await sbFetch('DELETE',`projects?id=eq.${id}`);
+}
+
+async function clearAllDb(){
+  if(!isSupaReady()){setLocal([]);return;}
+  await sbFetch('DELETE','projects?id=neq.0');
+}
 
 // NAV — highlight active link on click & scroll
 function setActive(el){
@@ -771,8 +874,8 @@ const emo=cat=>{
   return'📁';
 };
 
-function buildFilters(){
-  const ps=getP();
+async function buildFilters(){
+  const ps=await getP();
   const cats=['All',...new Set(ps.map(p=>p.cat).filter(Boolean))];
   document.getElementById('frow').innerHTML=cats.map(c=>
     `<button class="fb${c===curCat?' on':''}" onclick="filterBy('${c.replace(/'/g,"\\'")}',this)">${c}</button>`
@@ -786,11 +889,14 @@ function filterBy(cat,btn){
   renderPortfolio();
 }
 
-function renderPortfolio(){
-  const all=getP();
-  const list=curCat==='All'?all:all.filter(p=>p.cat===curCat);
+async function renderPortfolio(){
   const grid=document.getElementById('pgrid');
-  document.getElementById('pcnt').textContent=list.length+' project'+(list.length!==1?'s':'');
+  const cntEl=document.getElementById('pcnt');
+  // show loading state
+  grid.innerHTML=`<div class="fempty"><div class="fei" style="font-size:28px;animation:spin 1s linear infinite">⏳</div><div class="fed">Loading projects…</div></div>`;
+  const all=await getP();
+  const list=curCat==='All'?all:all.filter(p=>p.cat===curCat);
+  cntEl.textContent=list.length+' project'+(list.length!==1?'s':'');
   if(!list.length){
     grid.innerHTML=`<div class="fempty"><div class="fei">${curCat==='All'?'🗂':'🔍'}</div><div class="fet">${curCat==='All'?'No projects yet':'No projects in this category'}</div><div class="fed">Click ⚙ bottom-right to add projects</div></div>`;
     return;
@@ -822,8 +928,9 @@ function renderPortfolio(){
 }
 
 // DRAWER
-function openDrawer(id){
-  const p=getP().find(x=>x.id===id);if(!p)return;
+async function openDrawer(id){
+  const all=await getP();
+  const p=all.find(x=>x.id===id);if(!p)return;
   const e=emo(p.cat);
   const ghSvg=`<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>`;
   document.getElementById('dbody').innerHTML=`
@@ -866,17 +973,9 @@ function openPanel(){
 function closeMo(id){document.getElementById(id).classList.remove('on')}
 document.querySelectorAll('.mo').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('on')}));
 
-function aTab(id,btn){
-  document.querySelectorAll('.at').forEach(b=>b.classList.remove('on'));
-  document.querySelectorAll('.ap').forEach(p=>p.classList.remove('on'));
-  btn.classList.add('on');document.getElementById('ap-'+id).classList.add('on');
-  if(id==='manage')renderAList();
-  if(id==='stats')renderStats();
-  if(id==='resume')loadGroqKey();
-}
 
 // ADD
-function addProject(){
+async function addProject(){
   const t=document.getElementById('aT').value.trim();
   const c=document.getElementById('aC').value.trim();
   if(!t||!c){
@@ -884,6 +983,8 @@ function addProject(){
     setTimeout(()=>e.style.display='none',2500);return;
   }
   const raw=document.getElementById('aTg').value.trim();
+  const btn=document.getElementById('addProjectBtn');
+  btn.disabled=true;btn.textContent='Saving…';
   const p={id:Date.now(),title:t,cat:c,
     desc:document.getElementById('aD').value.trim(),
     tags:raw?raw.split(',').map(s=>s.trim()).filter(Boolean):[],
@@ -891,17 +992,19 @@ function addProject(){
     img:document.getElementById('aI').value.trim(),
     live:document.getElementById('aLv').value.trim(),
     gh:document.getElementById('aGh').value.trim()};
-  const all=getP();all.unshift(p);setP(all);
+  await addToDb(p);
   ['aT','aC','aD','aTg','aYr','aI','aLv','aGh'].forEach(i=>document.getElementById(i).value='');
+  btn.disabled=false;btn.textContent='＋ Add Project';
   const ok=document.getElementById('addok');ok.style.display='block';
   setTimeout(()=>ok.style.display='none',2500);
-  buildFilters();renderPortfolio();
+  await buildFilters();await renderPortfolio();
 }
 
 // MANAGE LIST
-function renderAList(){
-  const all=getP();
+async function renderAList(){
   const el=document.getElementById('alist');
+  el.innerHTML='<div style="color:var(--t3);font-family:var(--m);font-size:0.73rem;padding:14px 0">Loading…</div>';
+  const all=await getP();
   if(!all.length){el.innerHTML='<div style="color:var(--t3);font-family:var(--m);font-size:0.73rem;padding:14px 0">No projects yet. Add one from the Add tab.</div>';return}
   el.innerHTML=all.map(p=>`
     <div id="ai-${p.id}">
@@ -932,10 +1035,10 @@ function renderAList(){
     </div>`).join('');
 }
 function toggleEdit(id){document.getElementById('er-'+id).classList.toggle('on')}
-function saveEdit(id){
-  const all=getP();const i=all.findIndex(p=>p.id===id);if(i<0)return;
+async function saveEdit(id){
+  const all=await getP();const i=all.findIndex(p=>p.id===id);if(i<0)return;
   const raw=document.getElementById('etg-'+id).value.trim();
-  all[i]={...all[i],
+  const updated={...all[i],
     title:document.getElementById('et-'+id).value.trim(),
     cat:document.getElementById('ec-'+id).value.trim(),
     desc:document.getElementById('ed-'+id).value.trim(),
@@ -944,16 +1047,18 @@ function saveEdit(id){
     img:document.getElementById('ei-'+id).value.trim(),
     live:document.getElementById('el-'+id).value.trim(),
     gh:document.getElementById('eg-'+id).value.trim()};
-  setP(all);renderAList();buildFilters();renderPortfolio();
+  await updateInDb(updated);
+  await renderAList();await buildFilters();await renderPortfolio();
 }
-function delProj(id){
+async function delProj(id){
   if(!confirm('Delete this project?'))return;
-  setP(getP().filter(p=>p.id!==id));renderAList();buildFilters();renderPortfolio();
+  await deleteFromDb(id);
+  await renderAList();await buildFilters();await renderPortfolio();
 }
 
 // STATS
-function renderStats(){
-  const all=getP();
+async function renderStats(){
+  const all=await getP();
   const cats=[...new Set(all.map(p=>p.cat).filter(Boolean))];
   document.getElementById('strow').innerHTML=`
     <div class="stc"><div class="stn">${all.length}</div><div class="stl">Projects</div></div>
@@ -984,24 +1089,37 @@ function changePw(){
   ['cp','np','cnp'].forEach(i=>document.getElementById(i).value='');
   setTimeout(()=>ok.style.display='none',2500);
 }
-function clearAll(){
+async function clearAll(){
   if(!confirm('Delete ALL projects? Cannot be undone.'))return;
-  setP([]);buildFilters();renderPortfolio();renderAList();
+  await clearAllDb();
+  await buildFilters();await renderPortfolio();await renderAList();
 }
 
-// SEED
-(function(){
-  if(getP().length)return;
-  setP([
-    {id:1,title:'Space Tracker',cat:'Python Projects',desc:'Personal expense tracking dashboard built with Python and Plotly Dash, featuring budget breakdowns, category analysis, and monthly spending trends with interactive charts.',tags:['Python','Dash','Plotly','Pandas'],img:'',live:'',gh:'https://github.com/prajwalraj21'},
-    {id:2,title:'Car Performance & Price Analysis',cat:'EDA',desc:'Exploratory data analysis on a large car dataset uncovering relationships between engine specs, performance metrics, and pricing. Rich visual storytelling with Seaborn and Matplotlib.',tags:['Python','Seaborn','Matplotlib','EDA'],img:'',live:'',gh:'https://github.com/prajwalraj21'},
-    {id:3,title:'Price Inflator Tracker',cat:'Databricks ETL Pipeline',desc:'End-to-end ETL pipeline on Databricks ingesting raw pricing data, applying business transformations, and writing inflation analytics to a Delta Lake table with automated scheduling.',tags:['Databricks','PySpark','SQL','Delta Lake'],img:'',live:'',gh:'https://github.com/prajwalraj21'},
-    {id:4,title:'Databricks S3 ETL Lakehouse',cat:'Databricks ETL Pipeline',desc:'Production-grade data lakehouse architecture combining Databricks, AWS S3, and Delta Lake. Features automated incremental ingestion, schema evolution, and data quality checks.',tags:['AWS S3','Delta Lake','PySpark','Glue'],img:'',live:'',gh:'https://github.com/prajwalraj21'},
-    {id:5,title:'Databricks S3 Stock Update ETL',cat:'Databricks ETL Pipeline',desc:'Real-time stock data ingestion pipeline using Alpha Vantage API with automated Databricks Workflows scheduling and Slack alerting on pipeline failures.',tags:['Databricks','AWS','Python','Alpha Vantage'],img:'',live:'',gh:'https://github.com/prajwalraj21'},
+
+// SEED (only into localStorage if no Supabase configured)
+(async function(){
+  if(isSupaReady())return; // don't seed if DB connected
+  if(getLocal().length)return;
+  setLocal([
+    {id:1,title:'Space Tracker',cat:'Python Projects',year:'2025',desc:'Personal expense tracking dashboard built with Python and Plotly Dash, featuring budget breakdowns, category analysis, and monthly spending trends with interactive charts.',tags:['Python','Dash','Plotly','Pandas'],img:'',live:'',gh:'https://github.com/PrajwalRaj21'},
+    {id:2,title:'Car Performance & Price Analysis',cat:'EDA',year:'2025',desc:'Exploratory data analysis on a large car dataset uncovering relationships between engine specs, performance metrics, and pricing. Rich visual storytelling with Seaborn and Matplotlib.',tags:['Python','Seaborn','Matplotlib','EDA'],img:'',live:'',gh:'https://github.com/PrajwalRaj21'},
+    {id:3,title:'Price Inflator Tracker',cat:'Databricks ETL Pipeline',year:'2025',desc:'End-to-end ETL pipeline on Databricks ingesting raw pricing data, applying business transformations, and writing inflation analytics to a Delta Lake table with automated scheduling.',tags:['Databricks','PySpark','SQL','Delta Lake'],img:'',live:'',gh:'https://github.com/PrajwalRaj21'},
+    {id:4,title:'Databricks S3 ETL Lakehouse',cat:'Databricks ETL Pipeline',year:'2026',desc:'Production-grade data lakehouse architecture combining Databricks, AWS S3, and Delta Lake. Features automated incremental ingestion, schema evolution, and data quality checks.',tags:['AWS S3','Delta Lake','PySpark','Glue'],img:'',live:'',gh:'https://github.com/PrajwalRaj21'},
+    {id:5,title:'Databricks S3 Stock Update ETL',cat:'Databricks ETL Pipeline',year:'2026',desc:'Real-time stock data ingestion pipeline using Alpha Vantage API with automated Databricks Workflows scheduling and Slack alerting on pipeline failures.',tags:['Databricks','AWS','Python','Alpha Vantage'],img:'',live:'',gh:'https://github.com/PrajwalRaj21'},
   ]);
 })();
 
-buildFilters();renderPortfolio();
+function aTab(id,btn){
+  document.querySelectorAll('.at').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.ap').forEach(p=>p.classList.remove('on'));
+  btn.classList.add('on');document.getElementById('ap-'+id).classList.add('on');
+  if(id==='manage')renderAList();
+  if(id==='stats')renderStats();
+  if(id==='resume')loadGroqKey();
+  if(id==='settings')loadSupaCfg();
+}
+
+(async()=>{ await buildFilters(); await renderPortfolio(); })();
 </script>
 <!-- FULLSCREEN RESUME PREVIEW MODAL -->
 <div id="resumePreviewMo" style="
