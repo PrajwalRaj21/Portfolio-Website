@@ -421,7 +421,7 @@ footer{
     <div class="hero-label">Data Engineer / Kathmandu, Nepal</div>
     <h1>Building the data layer<br>startups <em>actually need.</em></h1>
     <p class="hero-bio">
-      I'm <strong>Prajwol Raj Giri</strong>, a Computer Engineering student and data engineer focused on building reliable data infrastructure — pipelines, warehouses, and dashboards that help early-stage startups make decisions on data, not guesswork.<br><br>
+      I'm <strong>Prajwol Raj Giri</strong>, a Computer Engineering graduate and data engineer focused on building reliable data infrastructure — pipelines, warehouses, and dashboards that help early-stage startups make decisions on data, not guesswork.<br><br>
       Founder of <strong>InferReach</strong>, a data engineering service for startups. Experienced with Python, SQL, Databricks, AWS, and the modern data stack.
     </p>
     <div class="hero-links">
@@ -582,28 +582,15 @@ footer{
     <div class="ap" id="ap-stats"><div class="strow" id="strow"></div><div id="catbars"></div></div>
     <!-- SETTINGS -->
     <div class="ap" id="ap-settings">
-      <div style="font-size:13px;font-weight:500;margin-bottom:4px">Supabase Database</div>
-      <div style="font-size:12px;color:var(--t2);margin-bottom:12px;line-height:1.6">Connect a free Supabase database so projects persist everywhere. Get URL & key from <a href="https://supabase.com" target="_blank" style="color:var(--text)">supabase.com</a> → Settings → API.</div>
-      <div class="pwrap" style="margin-bottom:0">
-        <div class="fg"><label class="fl">Supabase URL</label><input class="fi" id="sbUrl" placeholder="https://xxxx.supabase.co" oninput="saveSupaCfg()"></div>
-        <div class="fg"><label class="fl">Supabase Anon Key</label><input class="fi" id="sbKey" type="password" placeholder="eyJh…" oninput="saveSupaCfg()"></div>
+      <div style="font-size:13px;font-weight:500;margin-bottom:4px">Change Password</div>
+      <div class="pwrap">
+        <div class="fg"><label class="fl">Current</label><input class="fi" id="cp" type="password" placeholder="••••••••"></div>
+        <div class="fg"><label class="fl">New</label><input class="fi" id="np" type="password" placeholder="••••••••"></div>
+        <div class="fg"><label class="fl">Confirm</label><input class="fi" id="cnp" type="password" placeholder="••••••••"></div>
         <div style="display:flex;align-items:center;gap:10px">
-          <button class="abtn" onclick="testSupabase()">Test Connection</button>
-          <div class="smsg" id="supaOk">✓ Connected</div>
-          <div class="emsg" id="supaErr">Connection failed.</div>
-        </div>
-      </div>
-      <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
-        <div style="font-size:13px;font-weight:500;margin-bottom:12px">Change Password</div>
-        <div class="pwrap">
-          <div class="fg"><label class="fl">Current</label><input class="fi" id="cp" type="password" placeholder="••••••••"></div>
-          <div class="fg"><label class="fl">New</label><input class="fi" id="np" type="password" placeholder="••••••••"></div>
-          <div class="fg"><label class="fl">Confirm</label><input class="fi" id="cnp" type="password" placeholder="••••••••"></div>
-          <div style="display:flex;align-items:center;gap:10px">
-            <button class="abtn" onclick="changePw()">Update</button>
-            <div class="smsg" id="pwok">✓ Updated</div>
-            <div class="emsg" id="pwerr">Check passwords.</div>
-          </div>
+          <button class="abtn" onclick="changePw()">Update</button>
+          <div class="smsg" id="pwok">✓ Updated</div>
+          <div class="emsg" id="pwerr">Check passwords.</div>
         </div>
       </div>
       <div class="dzone"><div class="dzl">Danger Zone</div><button class="abtn abtn-danger" onclick="clearAll()">Delete All Projects</button></div>
@@ -615,26 +602,59 @@ footer{
 <div onclick="openAdmin()" style="position:fixed;bottom:0;right:0;width:24px;height:24px;z-index:100;opacity:0;cursor:default"></div>
 
 <script>
-const SK='prg3_projects',PK='prg3_pw',DP='prajwol2024';
-const SB_URL_KEY='prg_sb_url',SB_KEY_KEY='prg_sb_key';
-let loggedIn=false,curCat='All';
-const SB_URL_DEFAULT='https://huhinvhseftmooirehuw.supabase.co';
-const SB_KEY_DEFAULT='PASTE_YOUR_ANON_KEY_HERE';
-const getSbUrl=()=>localStorage.getItem(SB_URL_KEY)||SB_URL_DEFAULT;
-const getSbKey=()=>localStorage.getItem(SB_KEY_KEY)||SB_KEY_DEFAULT;
-const isSupaReady=()=>!!(getSbUrl()&&getSbKey()&&getSbKey()!=='PASTE_YOUR_ANON_KEY_HERE');
-function saveSupaCfg(){localStorage.setItem(SB_URL_KEY,document.getElementById('sbUrl').value.trim());localStorage.setItem(SB_KEY_KEY,document.getElementById('sbKey').value.trim())}
-function loadSupaCfg(){const u=document.getElementById('sbUrl');const k=document.getElementById('sbKey');if(u)u.value=getSbUrl();if(k)k.value=getSbKey()}
-async function sbFetch(method,path,body){const url=`${getSbUrl()}/rest/v1/${path}`;const headers={'apikey':getSbKey(),'Authorization':`Bearer ${getSbKey()}`,'Content-Type':'application/json','Prefer':method==='POST'?'return=representation':''};const opts={method,headers};if(body)opts.body=JSON.stringify(body);return fetch(url,opts)}
-async function testSupabase(){const ok=document.getElementById('supaOk');const err=document.getElementById('supaErr');ok.style.display='none';err.style.display='none';if(!isSupaReady()){err.style.display='block';err.textContent='Enter URL and key first.';return}try{const r=await sbFetch('GET','projects?limit=1');if(r.ok){ok.style.display='block';setTimeout(()=>ok.style.display='none',2500)}else throw new Error()}catch{err.style.display='block';setTimeout(()=>err.style.display='none',3000)}}
+// ── CONFIG ── Replace with your Worker URL after deploying
+const API = ' https://portfolio-website.christprajwal.workers.dev';
+
+const SK='prg3_projects', PK='prg3_pw', DP='prajwol2024';
+let loggedIn=false, curCat='All';
+
 const getPw=()=>localStorage.getItem(PK)||DP;
 const getLocal=()=>{try{return JSON.parse(localStorage.getItem(SK))||[]}catch{return[]}};
 const setLocal=d=>localStorage.setItem(SK,JSON.stringify(d));
-async function getP(){if(!isSupaReady())return getLocal();try{const r=await sbFetch('GET','projects?order=created_at.desc');if(!r.ok)throw new Error();const rows=await r.json();return rows.map(row=>({id:row.id,title:row.title,cat:row.cat,desc:row.description,tags:row.tags?row.tags.split(',').filter(Boolean):[],year:row.year||'',img:row.img||'',live:row.live||'',gh:row.gh||''}))}catch{return getLocal()}}
-async function addToDb(p){if(!isSupaReady()){const all=getLocal();all.unshift(p);setLocal(all);return}await sbFetch('POST','projects',{id:p.id,title:p.title,cat:p.cat,description:p.desc,tags:(p.tags||[]).join(','),year:p.year||'',img:p.img||'',live:p.live||'',gh:p.gh||''})}
-async function updateInDb(p){if(!isSupaReady()){const all=getLocal();const i=all.findIndex(x=>x.id===p.id);if(i>=0){all[i]=p;setLocal(all)}return}await sbFetch('PATCH',`projects?id=eq.${p.id}`,{title:p.title,cat:p.cat,description:p.desc,tags:(p.tags||[]).join(','),year:p.year||'',img:p.img||'',live:p.live||'',gh:p.gh||''})}
-async function deleteFromDb(id){if(!isSupaReady()){setLocal(getLocal().filter(p=>p.id!==id));return}await sbFetch('DELETE',`projects?id=eq.${id}`)}
-async function clearAllDb(){if(!isSupaReady()){setLocal([]);return}await sbFetch('DELETE','projects?id=neq.0')}
+
+async function getP(){
+  try{
+    const r=await fetch(`${API}/projects`);
+    if(!r.ok)throw new Error();
+    const rows=await r.json();
+    return rows.map(row=>({
+      id:row.id, title:row.title, cat:row.cat,
+      desc:row.description,
+      tags:row.tags?row.tags.split(',').filter(Boolean):[],
+      year:row.year||'', img:row.img||'', live:row.live||'', gh:row.gh||''
+    }));
+  }catch{return getLocal()}
+}
+
+async function addToDb(p){
+  try{
+    await fetch(`${API}/projects`,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({id:p.id,title:p.title,cat:p.cat,description:p.desc,
+        tags:(p.tags||[]).join(','),year:p.year||'',img:p.img||'',live:p.live||'',gh:p.gh||''})});
+  }catch{const all=getLocal();all.unshift(p);setLocal(all)}
+}
+
+async function updateInDb(p){
+  try{
+    await fetch(`${API}/projects`,{method:'PATCH',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({id:p.id,title:p.title,cat:p.cat,description:p.desc,
+        tags:(p.tags||[]).join(','),year:p.year||'',img:p.img||'',live:p.live||'',gh:p.gh||''})});
+  }catch{const all=getLocal();const i=all.findIndex(x=>x.id===p.id);if(i>=0){all[i]=p;setLocal(all)}}
+}
+
+async function deleteFromDb(id){
+  try{
+    await fetch(`${API}/projects`,{method:'DELETE',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({id})});
+  }catch{setLocal(getLocal().filter(p=>p.id!==id))}
+}
+
+async function clearAllDb(){
+  try{
+    await fetch(`${API}/projects`,{method:'DELETE',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({id:'all'})});
+  }catch{setLocal([])}
+}
 
 // NAV scroll
 window.addEventListener('scroll',()=>document.getElementById('nav').classList.toggle('scrolled',window.scrollY>20));
@@ -662,7 +682,7 @@ async function delProj(id){if(!confirm('Delete this project?'))return;await dele
 async function renderStats(){const all=await getP();const cats=[...new Set(all.map(p=>p.cat).filter(Boolean))];document.getElementById('strow').innerHTML=`<div class="stc"><div class="stn">${all.length}</div><div class="stl">Projects</div></div><div class="stc"><div class="stn">${cats.length}</div><div class="stl">Categories</div></div><div class="stc"><div class="stn">${all.filter(p=>p.live||p.gh).length}</div><div class="stl">With Links</div></div>`;if(!all.length){document.getElementById('catbars').innerHTML='';return}const max=Math.max(...cats.map(c=>all.filter(p=>p.cat===c).length));document.getElementById('catbars').innerHTML=cats.map(c=>{const n=all.filter(p=>p.cat===c).length;return`<div class="bar-item"><div class="bar-top"><span class="bar-n">${c}</span><span class="bar-c">${n}</span></div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(n/max*100)}%"></div></div></div>`}).join('')}
 function changePw(){const cur=document.getElementById('cp').value;const nw=document.getElementById('np').value;const cf=document.getElementById('cnp').value;const ok=document.getElementById('pwok');const err=document.getElementById('pwerr');if(cur!==getPw()||!nw||nw!==cf){err.style.display='block';ok.style.display='none';setTimeout(()=>err.style.display='none',2500);return}localStorage.setItem(PK,nw);ok.style.display='block';err.style.display='none';['cp','np','cnp'].forEach(i=>document.getElementById(i).value='');setTimeout(()=>ok.style.display='none',2500)}
 async function clearAll(){if(!confirm('Delete ALL projects?'))return;await clearAllDb();await buildFilters();await renderPortfolio();await renderAList()}
-function aTab(id,btn){document.querySelectorAll('.at').forEach(b=>b.classList.remove('on'));document.querySelectorAll('.ap').forEach(p=>p.classList.remove('on'));btn.classList.add('on');document.getElementById('ap-'+id).classList.add('on');if(id==='manage')renderAList();if(id==='stats')renderStats();if(id==='settings')loadSupaCfg()}
+function aTab(id,btn){document.querySelectorAll('.at').forEach(b=>b.classList.remove('on'));document.querySelectorAll('.ap').forEach(p=>p.classList.remove('on'));btn.classList.add('on');document.getElementById('ap-'+id).classList.add('on');if(id==='manage')renderAList();if(id==='stats')renderStats()}
 (async()=>{await buildFilters();await renderPortfolio()})();
 </script>
 </body>
