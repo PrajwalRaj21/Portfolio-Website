@@ -1,13 +1,18 @@
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    const headers = {
+    
+    const corsHeaders = {
       'Access-Control-Allow-Origin': '*',
-      'Content-Type': 'application/json'
+      'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
     };
 
-    if (request.method === 'OPTIONS')
-      return new Response(null, { headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': '*', 'Access-Control-Allow-Headers': '*' } });
+    if (request.method === 'OPTIONS') {
+      return new Response(null, { status: 204, headers: corsHeaders });
+    }
+
+    const headers = { ...corsHeaders, 'Content-Type': 'application/json' };
 
     if (url.pathname === '/projects') {
       if (request.method === 'GET') {
@@ -33,6 +38,6 @@ export default {
         return new Response('{}', { headers });
       }
     }
-    return new Response('Not found', { status: 404 });
+    return new Response('Not found', { status: 404, headers });
   }
 };

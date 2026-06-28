@@ -10,5 +10,12 @@
   },
   "compatibility_flags": [
     "nodejs_compat"
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "personal-prajwol",
+      "database_id": "708dec00-b3e1-4424-8a8c-87017df44b1c"
+    }
   ]
 }

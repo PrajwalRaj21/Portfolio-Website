@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Scheduler — Inferreach</title>
+<style>
+:root{
+  --bg:#f7f5f0;
+  --bg2:#efede8;
+  --bg3:#e8e5de;
+  --text:#1a1916;
+  --t2:#6b6860;
+  --t3:#a8a49c;
+  --border:#dedad2;
+  --border2:#ccc9c0;
+  --accent:#1a1916;
+  --green:#2f7a4f;
+  --red:#a4392f;
+  --serif:'Georgia','Times New Roman',serif;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+  --mono:'SF Mono','Consolas',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.6;min-height:100vh}
+::-webkit-scrollbar{width:8px}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
+
+.wrap{max-width:760px;margin:0 auto;padding:48px 24px 120px}
+header{margin-bottom:40px}
+header h1{font-family:var(--serif);font-size:32px;font-weight:400}
+header .sub{font-family:var(--mono);font-size:11px;color:var(--t3);margin-top:6px;letter-spacing:.02em}
+
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:24px;margin-bottom:24px}
+.card h2{font-size:14px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.dot{width:8px;height:8px;border-radius:99px;background:var(--t3)}
+.dot.on{background:var(--green)}
+.dot.off{background:var(--red)}
+
+.lk-status{font-family:var(--mono);font-size:12px;color:var(--t2)}
+.btn{font-family:var(--mono);font-size:12px;padding:9px 16px;border-radius:7px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;transition:.15s}
+.btn:hover{border-color:var(--text)}
+.btn-primary{background:var(--text);color:var(--bg);border-color:var(--text)}
+.btn-primary:hover{opacity:.85}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.btn-sm{padding:6px 11px;font-size:11px}
+.btn-danger{color:var(--red);border-color:var(--red)}
+
+.fg{margin-bottom:14px}
+.fl{font-family:var(--mono);font-size:11px;color:var(--t2);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em}
+.fi,.fta{width:100%;padding:10px 12px;border:1px solid var(--border2);border-radius:7px;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px}
+.fi:focus,.fta:focus{outline:none;border-color:var(--text)}
+.fta{resize:vertical;min-height:140px;line-height:1.7}
+.row{display:flex;gap:12px}
+.row>*{flex:1}
+
+.charcount{font-family:var(--mono);font-size:11px;color:var(--t3);text-align:right;margin-top:4px}
+.charcount.warn{color:var(--red)}
+
+.post-item{padding:16px;border:1px solid var(--border);border-radius:8px;margin-bottom:10px;background:var(--bg)}
+.post-meta{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.post-time{font-family:var(--mono);font-size:11px;color:var(--t2)}
+.post-status{font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:99px;text-transform:uppercase}
+.status-pending{background:var(--bg3);color:var(--t2)}
+.status-awaiting_review{background:#fbeecf;color:#8a6515}
+.status-sent{background:#e3f0e7;color:var(--green)}
+.status-failed{background:#f5e3e1;color:var(--red)}
+.status-cancelled{background:var(--bg3);color:var(--t3)}
+.post-content{font-size:14px;white-space:pre-wrap;color:var(--text);margin-bottom:10px}
+.post-actions{display:flex;gap:8px}
+
+.empty{font-family:var(--mono);font-size:12px;color:var(--t3);padding:20px 0;text-align:center}
+.msg{font-family:var(--mono);font-size:12px;margin-top:10px;display:none}
+.msg.show{display:block}
+.msg-ok{color:var(--green)}
+.msg-err{color:var(--red)}
+
+.gen-result{margin-top:14px;display:none}
+.gen-result.show{display:block}
+
+.lock{display:flex;align-items:center;justify-content:center;min-height:100vh}
+.lock-box{text-align:center;max-width:320px}
+.lock-box h2{font-family:var(--serif);font-size:24px;margin-bottom:16px}
+</style>
+</head>
+<body>
+
+<div class="lock" id="lockScreen">
+  <div class="lock-box">
+    <h2>Scheduler</h2>
+    <div class="fg"><input class="fi" id="pwIn" type="password" placeholder="Admin password" autofocus></div>
+    <button class="btn btn-primary" style="width:100%" onclick="unlock()">Enter</button>
+    <div class="msg msg-err" id="lockErr">Incorrect password.</div>
+  </div>
+</div>
+
+<div class="wrap" id="app" style="display:none">
+  <header>
+    <h1>LinkedIn Scheduler</h1>
+    <div class="sub">INFERREACH · DRAFT WITH GROQ · SCHEDULE · AUTO-PUBLISH</div>
+  </header>
+
+  <div class="card">
+    <h2><span class="dot" id="lkDot"></span> LinkedIn Connection</h2>
+    <div class="lk-status" id="lkStatus">Checking…</div>
+    <div style="margin-top:12px"><a href="/auth/linkedin/login" class="btn">Connect / Reconnect LinkedIn</a></div>
+  </div>
+
+  <div class="card">
+    <h2>Draft a new post</h2>
+    <div class="fg">
+      <label class="fl">Topic / angle</label>
+      <input class="fi" id="topicIn" placeholder="e.g. why we built Inferreach around X, a recent client win, a hot take on Y">
+    </div>
+    <button class="btn btn-primary" id="genBtn" onclick="generate()">Generate with Groq</button>
+    <div class="msg msg-err" id="genErr">Generation failed. Try again.</div>
+
+    <div class="gen-result" id="genResult">
+      <div class="fg" style="margin-top:16px">
+        <label class="fl">Post content (editable)</label>
+        <textarea class="fta" id="contentTa" oninput="updateCharCount()"></textarea>
+        <div class="charcount" id="charCount">0 / 1300</div>
+      </div>
+      <div class="row">
+        <div class="fg">
+          <label class="fl">Date</label>
+          <input class="fi" id="dateIn" type="date">
+        </div>
+        <div class="fg">
+          <label class="fl">Time (your local time)</label>
+          <input class="fi" id="timeIn" type="time">
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="schedulePost()">Schedule post</button>
+      <div class="msg msg-ok" id="schedOk">✓ Scheduled.</div>
+      <div class="msg msg-err" id="schedErr">Failed to schedule.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Upcoming &amp; past posts</h2>
+    <div id="postsList"><div class="empty">Loading…</div></div>
+  </div>
+</div>
+
+<script>
+let pw = sessionStorage.getItem('sched_pw') || '';
+
+function unlock(){
+  const v = document.getElementById('pwIn').value;
+  if(!v) return;
+  pw = v;
+  sessionStorage.setItem('sched_pw', v);
+  init();
+}
+
+async function api(method, path, body){
+  const headers = {'Content-Type':'application/json'};
+  if(method !== 'GET') headers['x-admin-password'] = pw;
+  else headers['x-admin-password'] = pw;
+  const opts = {method, headers};
+  if(body) opts.body = JSON.stringify(body);
+  const r = await fetch(`/api/${path}`, opts);
+  if(r.status === 401){
+    sessionStorage.removeItem('sched_pw');
+    document.getElementById('lockScreen').style.display='flex';
+    document.getElementById('app').style.display='none';
+    throw new Error('Unauthorized');
+  }
+  if(!r.ok){
+    const e = await r.json().catch(()=>({error:'Request failed'}));
+    throw new Error(e.error || 'Request failed');
+  }
+  return r.json();
+}
+
+async function init(){
+  // Validate password by attempting a real call
+  try{
+    await loadStatus();
+    document.getElementById('lockScreen').style.display='none';
+    document.getElementById('app').style.display='block';
+    await loadPosts();
+  }catch(e){
+    document.getElementById('lockErr').classList.add('show');
+  }
+}
+
+async function loadStatus(){
+  const status = await api('GET','linkedin-status');
+  const dot = document.getElementById('lkDot');
+  const txt = document.getElementById('lkStatus');
+  if(status.connected){
+    dot.className = 'dot on';
+    txt.textContent = `Connected as ${status.name} · token valid until ${new Date(status.expires_at).toLocaleDateString()}`;
+  } else if(status.expired){
+    dot.className = 'dot off';
+    txt.textContent = `Token expired (was ${status.name}) — reconnect below`;
+  } else {
+    dot.className = 'dot off';
+    txt.textContent = 'Not connected yet';
+  }
+  return status;
+}
+
+function fmtDate(iso){
+  const d = new Date(iso + (iso.endsWith('Z')?'':'Z'));
+  return d.toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+}
+
+async function loadPosts(){
+  const list = document.getElementById('postsList');
+  list.innerHTML = '<div class="empty">Loading…</div>';
+  try{
+    const posts = await api('GET','posts');
+    if(!posts.length){ list.innerHTML = '<div class="empty">No posts yet. Draft one above.</div>'; return; }
+    list.innerHTML = posts.map(p=>`
+      <div class="post-item">
+        <div class="post-meta">
+          <span class="post-time">${fmtDate(p.scheduled_for)}${p.auto_generated ? ' · auto · '+escapeHtml(p.angle||'') : ''}</span>
+          <span class="post-status status-${p.status}">${p.status.replace('_',' ')}</span>
+        </div>
+        <div class="post-content">${escapeHtml(p.content)}</div>
+        ${(p.status==='pending'||p.status==='awaiting_review') ? `<div class="post-actions"><button class="btn btn-sm btn-danger" onclick="deletePost(${p.id})">Cancel</button></div>` : ''}
+        ${p.status==='failed' && p.error_message ? `<div class="post-time" style="color:var(--red)">${escapeHtml(p.error_message.slice(0,200))}</div>` : ''}
+      </div>
+    `).join('');
+  }catch(e){
+    list.innerHTML = `<div class="empty">Failed to load: ${escapeHtml(e.message)}</div>`;
+  }
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+async function generate(){
+  const topic = document.getElementById('topicIn').value.trim();
+  const errEl = document.getElementById('genErr');
+  errEl.classList.remove('show');
+  if(!topic){ errEl.textContent='Enter a topic first.'; errEl.classList.add('show'); return; }
+
+  const btn = document.getElementById('genBtn');
+  btn.disabled = true; btn.textContent = 'Generating…';
+  try{
+    const res = await api('POST','generate-post',{topic});
+    document.getElementById('contentTa').value = res.content;
+    document.getElementById('genResult').classList.add('show');
+    updateCharCount();
+    // default schedule time: tomorrow 9am local
+    const tmrw = new Date(); tmrw.setDate(tmrw.getDate()+1);
+    document.getElementById('dateIn').value = tmrw.toISOString().slice(0,10);
+    document.getElementById('timeIn').value = '09:00';
+  }catch(e){
+    errEl.textContent = e.message;
+    errEl.classList.add('show');
+  }
+  btn.disabled = false; btn.textContent = 'Generate with Groq';
+}
+
+function updateCharCount(){
+  const len = document.getElementById('contentTa').value.length;
+  const el = document.getElementById('charCount');
+  el.textContent = `${len} / 1300`;
+  el.classList.toggle('warn', len > 1300);
+}
+
+async function schedulePost(){
+  const content = document.getElementById('contentTa').value.trim();
+  const date = document.getElementById('dateIn').value;
+  const time = document.getElementById('timeIn').value;
+  const okEl = document.getElementById('schedOk');
+  const errEl = document.getElementById('schedErr');
+  okEl.classList.remove('show'); errEl.classList.remove('show');
+
+  if(!content || !date || !time){
+    errEl.textContent = 'Content, date, and time are all required.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  const localDt = new Date(`${date}T${time}:00`);
+  const scheduledForUtc = localDt.toISOString();
+
+  try{
+    await api('POST','posts',{
+      content,
+      scheduled_for: scheduledForUtc,
+      generated_by_groq: true,
+      topic_prompt: document.getElementById('topicIn').value.trim(),
+    });
+    okEl.classList.add('show');
+    document.getElementById('genResult').classList.remove('show');
+    document.getElementById('topicIn').value='';
+    await loadPosts();
+  }catch(e){
+    errEl.textContent = e.message;
+    errEl.classList.add('show');
+  }
+}
+
+async function deletePost(id){
+  if(!confirm('Cancel this scheduled post?')) return;
+  try{
+    await api('DELETE', `posts?id=${id}`);
+    await loadPosts();
+  }catch(e){
+    alert('Failed to cancel: ' + e.message);
+  }
+}
+
+if(pw) init();
+else document.getElementById('lockScreen').style.display='flex';
+</script>
+</body>
+</html>
