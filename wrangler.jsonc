@@ -1,12 +1,18 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "portfolio-website",
+  "main": "worker.js",
   "compatibility_date": "2026-05-25",
   "observability": {
     "enabled": true
   },
   "assets": {
-    "directory": "."
+    "directory": ".",
+    "run_worker_first": [
+      "/api/*",
+      "/auth/*",
+      "/projects"
+    ]
   },
   "compatibility_flags": [
     "nodejs_compat"
@@ -21,7 +27,7 @@
   "triggers": {
     "crons": [
       "*/5 * * * *",
-      "15 2 * * *"
+      "15 10 * * *"
     ]
   }
 }
