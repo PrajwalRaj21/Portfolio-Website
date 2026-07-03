@@ -163,22 +163,46 @@ async function handleLinkedinStatus(request, env) {
 // ---------- Groq ----------
 
 async function generateWithGroq(systemPrompt, userPrompt, env) {
-  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${env.GROQ_API_KEY}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'openai/gpt-oss-120b',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt },
-      ],
-      temperature: 0.85,
-      max_tokens: 500,
-    }),
-  });
-  if (!res.ok) throw new Error(`Groq request failed: ${await res.text()}`);
-  const data = await res.json();
-  return (data.choices && data.choices[0] && data.choices[0].message.content.trim()) || '';
+  const models = ['openai/gpt-oss-120b', 'qwen/qwen3.6-27b'];
+  
+  for (const model of models) {
+    try {
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${env.GROQ_API_KEY}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt },
+          ],
+          temperature: 0.85,
+          max_tokens: 500,
+        }),
+      });
+      
+      if (!res.ok) {
+        console.error(`Groq model ${model} failed: ${res.status}`);
+        continue; // try next model
+      }
+      
+      const data = await res.json();
+      const content = data.choices?.[0]?.message?.content?.trim() || '';
+      
+      if (!content) {
+        console.error(`Groq model ${model} returned empty content`);
+        continue; // try next model
+      }
+      
+      console.log(`Groq model ${model} succeeded`);
+      return content;
+    } catch (e) {
+      console.error(`Groq model ${model} threw: ${e.message}`);
+      continue; // try next model
+    }
+  }
+  
+  throw new Error('All Groq models failed');
 }
 
 async function handleGeneratePost(request, env) {
