@@ -163,8 +163,7 @@ async function handleLinkedinStatus(request, env) {
 // ---------- Groq ----------
 
 async function generateWithGroq(systemPrompt, userPrompt, env) {
-  const models = ['openai/gpt-oss-120b', 'qwen/qwen3.6-27b'];
-  
+  const models = ['llama-3.3-70b-versatile', 'llama3-70b-8192'];
   for (const model of models) {
     try {
       const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -187,7 +186,8 @@ async function generateWithGroq(systemPrompt, userPrompt, env) {
       }
       
       const data = await res.json();
-      const content = data.choices?.[0]?.message?.content?.trim() || '';
+      const raw = data.choices?.[0]?.message?.content?.trim() || '';
+      const content = raw.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
       
       if (!content) {
         console.error(`Groq model ${model} returned empty content`);
