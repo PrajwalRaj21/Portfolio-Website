@@ -5,17 +5,32 @@
 //   /auth/linkedin/callback -- OAuth callback, stores token in D1
 //   /api/linkedin-status    -- connection status for the scheduler UI
 //   /api/generate-post      -- on-demand Groq draft generation
-//   /api/auto-generate      -- autonomous daily draft + review email (cron-triggered)
+//   /api/auto-generate      -- autonomous draft + review email (cron-triggered, gated to every-other-day + random time)
 //   /api/posts              -- CRUD for scheduled_posts
 //   /api/publish-due        -- publishes due posts to LinkedIn (cron-triggered)
 //   /api/cancel-post        -- one-click cancel link target (from review email)
 //
 // Cron Triggers for this Worker (set in wrangler.jsonc):
-//   */5 * * * *   -> publish-due check
-//   15 2 * * *    -> daily auto-generate (08:00 Kathmandu time)
+//   */5 * * * *      -> publish-due check (every 5 min, all day)
+//   */10 10-11 * * * -> auto-generate window check (every 10 min, 10:15-11:15 UTC == 16:00-17:00 Kathmandu time)
+//
+// SCHEDULING LOGIC (every-other-day, random time 4-5pm Kathmandu):
+//   D1 table `auto_post_schedule` (id=1) tracks:
+//     last_post_date  -- the date (YYYY-MM-DD, Kathmandu-local) a post was last auto-generated
+//     next_run_at     -- the randomly chosen ISO timestamp within today's 4-5pm window, once picked
+//   On each cron tick inside the window:
+//     1. Skip if last_post_date was yesterday or today (i.e. not yet 2 days since last post).
+//     2. If eligible and next_run_at isn't set for today yet, pick a random time in the
+//        remaining window and store it (don't post yet).
+//     3. If eligible and now >= next_run_at, generate + send review email, and record today
+//        as last_post_date.
 
 const LINKEDIN_API_VERSION = '202506';
-const AUTO_GENERATE_CRON = '15 10 * * *';
+
+// Kathmandu is UTC+5:45. The 4:00-5:00pm (16:00-17:00) local window is 10:15-11:15 UTC.
+const WINDOW_START_UTC_MINUTES = 10 * 60 + 15; // 10:15 UTC
+const WINDOW_END_UTC_MINUTES = 11 * 60 + 15;   // 11:15 UTC
+const KATHMANDU_OFFSET_MINUTES = 5 * 60 + 45;
 
 const ANGLES = [
   {
@@ -33,6 +48,38 @@ const ANGLES = [
   {
     key: 'client_value',
     brief: "Talk about the kind of problem Inferreach solves for clients and why it matters, without naming a specific real client unless one is provided. Frame it around the client's pain point, not a sales pitch.",
+  },
+  {
+    key: 'technical_deep_dive',
+    brief: 'Explain one specific technical concept relevant to data engineering or IT infrastructure (e.g. pipeline monitoring, data quality checks, orchestration tradeoffs) in a way a non-technical founder could still follow. Show expertise without jargon-dumping.',
+  },
+  {
+    key: 'mistake_or_failure',
+    brief: 'Describe a real or plausible mistake, wrong assumption, or failed approach in building software/data systems, and what it taught you. Vulnerability builds trust -- but stay in professional territory, not personal oversharing.',
+  },
+  {
+    key: 'contrarian_take',
+    brief: 'Challenge a common assumption or piece of "conventional wisdom" in software development, IT consulting, or startup tooling. Be specific about what people get wrong and why. Should spark disagreement or debate in the comments.',
+  },
+  {
+    key: 'cost_or_roi',
+    brief: 'Talk about the real cost of a common IT/data problem (downtime, bad data, technical debt, slow reporting) in terms a business decision-maker cares about -- time, money, missed opportunities. Avoid inventing specific numbers; use realistic ranges or scenarios instead.',
+  },
+  {
+    key: 'process_or_workflow',
+    brief: 'Walk through how Inferreach approaches a specific type of project or problem (e.g. auditing a client\'s existing pipeline, onboarding a new data source, diagnosing a broken dashboard) as a mini case-study-style narrative, without naming a real client.',
+  },
+  {
+    key: 'trend_prediction',
+    brief: 'Make a specific, falsifiable prediction about where IT services, data infrastructure, or small-business tech adoption is headed in the next 1-2 years. Ground it in something observable now, not vague futurism.',
+  },
+  {
+    key: 'hiring_or_team',
+    brief: 'Share a perspective on what makes a good data engineer, IT consultant, or technical hire -- or a lesson about building/running a small technical team. Keep it grounded in practical experience, not generic leadership platitudes.',
+  },
+  {
+    key: 'tool_or_stack_opinion',
+    brief: 'Share a specific, opinionated take on a tool, platform, or approach commonly used in data engineering or IT infrastructure (e.g. when NOT to use a certain orchestrator, why a "boring" tool beats a trendy one for most companies). Should read as earned expertise, not a sponsored post.',
   },
 ];
 
@@ -83,6 +130,29 @@ function checkAdmin(request, env) {
 function checkCron(request, env) {
   const provided = request.headers.get('x-cron-secret') || '';
   return Boolean(provided) && provided === env.CRON_SECRET;
+}
+
+// Returns today's date as YYYY-MM-DD in Kathmandu local time
+function kathmanduDateString(date) {
+  const d = new Date(date.getTime() + KATHMANDU_OFFSET_MINUTES * 60 * 1000);
+  return d.toISOString().slice(0, 10);
+}
+
+function daysBetween(dateStrA, dateStrB) {
+  const a = new Date(dateStrA + 'T00:00:00Z');
+  const b = new Date(dateStrB + 'T00:00:00Z');
+  return Math.round((b - a) / (24 * 60 * 60 * 1000));
+}
+
+// Picks a random UTC timestamp between now (or window start, whichever is later) and window end, for "today"
+function pickRandomTimeInWindow(now) {
+  const dayStartUtc = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  const windowStart = new Date(dayStartUtc.getTime() + WINDOW_START_UTC_MINUTES * 60 * 1000);
+  const windowEnd = new Date(dayStartUtc.getTime() + WINDOW_END_UTC_MINUTES * 60 * 1000);
+  const earliestPick = now > windowStart ? now : windowStart;
+  if (earliestPick >= windowEnd) return windowEnd; // window basically over, fire ASAP
+  const randMs = earliestPick.getTime() + Math.random() * (windowEnd.getTime() - earliestPick.getTime());
+  return new Date(randMs);
 }
 
 // ---------- LinkedIn OAuth ----------
@@ -161,9 +231,11 @@ async function handleLinkedinStatus(request, env) {
 }
 
 // ---------- Groq ----------
+// NOTE: llama-3.3-70b-versatile and llama3-70b-8192 were both deprecated by Groq
+// (announced June 17, 2026). Using their recommended replacements instead.
 
 async function generateWithGroq(systemPrompt, userPrompt, env) {
-  const models = ['llama-3.3-70b-versatile', 'llama3-70b-8192'];
+  const models = ['openai/gpt-oss-120b', 'openai/gpt-oss-20b'];
   for (const model of models) {
     try {
       const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -179,21 +251,21 @@ async function generateWithGroq(systemPrompt, userPrompt, env) {
           max_tokens: 500,
         }),
       });
-      
+
       if (!res.ok) {
         console.error(`Groq model ${model} failed: ${res.status}`);
         continue; // try next model
       }
-      
+
       const data = await res.json();
       const raw = data.choices?.[0]?.message?.content?.trim() || '';
       const content = raw.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
-      
+
       if (!content) {
         console.error(`Groq model ${model} returned empty content`);
         continue; // try next model
       }
-      
+
       console.log(`Groq model ${model} succeeded`);
       return content;
     } catch (e) {
@@ -201,7 +273,7 @@ async function generateWithGroq(systemPrompt, userPrompt, env) {
       continue; // try next model
     }
   }
-  
+
   throw new Error('All Groq models failed');
 }
 
@@ -310,7 +382,7 @@ async function handlePublishDue(request, env) {
   return json(result);
 }
 
-// ---------- auto-generate ----------
+// ---------- auto-generate scheduling gate (every-other-day, random 4-5pm Kathmandu) ----------
 
 async function nextAngle(env) {
   const row = await env.DB.prepare('SELECT last_index FROM angle_rotation WHERE id = 1').first();
@@ -318,6 +390,21 @@ async function nextAngle(env) {
   const nextIndex = (lastIndex + 1) % ANGLES.length;
   await env.DB.prepare('UPDATE angle_rotation SET last_index = ? WHERE id = 1').bind(nextIndex).run();
   return ANGLES[nextIndex];
+}
+
+async function getScheduleState(env) {
+  const row = await env.DB.prepare('SELECT last_post_date, next_run_at FROM auto_post_schedule WHERE id = 1').first();
+  return row || { last_post_date: null, next_run_at: null };
+}
+
+async function setScheduleState(env, { last_post_date, next_run_at }) {
+  await env.DB.prepare(
+    `INSERT INTO auto_post_schedule (id, last_post_date, next_run_at)
+     VALUES (1, ?, ?)
+     ON CONFLICT(id) DO UPDATE SET
+       last_post_date = excluded.last_post_date,
+       next_run_at = excluded.next_run_at`
+  ).bind(last_post_date ?? null, next_run_at ?? null).run();
 }
 
 async function sendReviewEmail({ content, angle, cancelUrl, reviewUrl }, env) {
@@ -344,7 +431,7 @@ async function sendReviewEmail({ content, angle, cancelUrl, reviewUrl }, env) {
   if (!res.ok) console.error('Resend email failed:', await res.text());
 }
 
-async function runAutoGenerate(request, env) {
+async function generateAndQueue(request, env) {
   const angle = await nextAngle(env);
   let content;
   try {
@@ -371,9 +458,44 @@ async function runAutoGenerate(request, env) {
   return { success: true, id, angle: angle.key, publishAt };
 }
 
+// Called on every cron tick that lands inside the 4-5pm Kathmandu window.
+// Handles the every-other-day gate + picks/waits for a random time within the window.
+async function runAutoGenerateGate(request, env) {
+  const now = new Date();
+  const todayStr = kathmanduDateString(now);
+  const state = await getScheduleState(env);
+
+  // Gate 1: every-other-day. Skip if we posted yesterday or already today.
+  if (state.last_post_date) {
+    const gap = daysBetween(state.last_post_date, todayStr);
+    if (gap < 2) {
+      return { skipped: true, reason: `last post was ${gap} day(s) ago, waiting for every-other-day gate`, last_post_date: state.last_post_date };
+    }
+  }
+
+  // Gate 2: random time within window. If not yet picked for today, pick it and wait.
+  const alreadyPickedToday = state.next_run_at && kathmanduDateString(new Date(state.next_run_at)) === todayStr;
+  if (!alreadyPickedToday) {
+    const randomTime = pickRandomTimeInWindow(now);
+    await setScheduleState(env, { last_post_date: state.last_post_date, next_run_at: randomTime.toISOString() });
+    return { skipped: true, reason: 'picked random run time for today', next_run_at: randomTime.toISOString() };
+  }
+
+  if (now < new Date(state.next_run_at)) {
+    return { skipped: true, reason: 'waiting for picked time', next_run_at: state.next_run_at };
+  }
+
+  // Time to actually generate + queue the post.
+  const result = await generateAndQueue(request, env);
+  if (!result.error) {
+    await setScheduleState(env, { last_post_date: todayStr, next_run_at: null });
+  }
+  return result;
+}
+
 async function handleAutoGenerate(request, env) {
   if (!checkCron(request, env)) return json({ error: 'Unauthorized' }, 401);
-  const result = await runAutoGenerate(request, env);
+  const result = await runAutoGenerateGate(request, env);
   return json(result, result.error ? 502 : 200);
 }
 
@@ -484,10 +606,13 @@ export default {
 
   // Cron Trigger entrypoint -- this Worker has crons defined in wrangler.jsonc
   async scheduled(event, env, ctx) {
-    if (event.cron === AUTO_GENERATE_CRON) {
-      // auto-generate needs a "request" only for url.origin; build a fake one from env
+    const now = new Date();
+    const utcMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
+    const inAutoGenerateWindow = utcMinutes >= WINDOW_START_UTC_MINUTES && utcMinutes <= WINDOW_END_UTC_MINUTES;
+
+    if (inAutoGenerateWindow) {
       const fakeRequest = new Request('https://prajwolraj.com.np/api/auto-generate');
-      const result = await runAutoGenerate(fakeRequest, env);
+      const result = await runAutoGenerateGate(fakeRequest, env);
       console.log('auto-generate (cron):', JSON.stringify(result));
     } else {
       const result = await runPublishDue(env);
