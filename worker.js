@@ -5,7 +5,7 @@
 //   /auth/linkedin/callback -- OAuth callback, stores token in D1
 //   /api/linkedin-status    -- connection status for the scheduler UI
 //   /api/generate-post      -- on-demand Groq draft generation
-//   /api/auto-generate      -- autonomous draft + review email (cron-triggered, gated to every-other-day + random time)
+//   /api/auto-generate      -- autonomous draft + review email (cron-triggered, daily at a random time)
 //   /api/posts              -- CRUD for scheduled_posts
 //   /api/publish-due        -- publishes due posts to LinkedIn (cron-triggered)
 //   /api/cancel-post        -- one-click cancel link target (from review email)
@@ -14,16 +14,16 @@
 //   */5 * * * *      -> publish-due check (every 5 min, all day)
 //   */10 10-11 * * * -> auto-generate window check (every 10 min, 10:15-11:15 UTC == 16:00-17:00 Kathmandu time)
 //
-// SCHEDULING LOGIC (every-other-day, random time 4-5pm Kathmandu):
+// SCHEDULING LOGIC (daily, random time 4-5pm Kathmandu):
 //   D1 table `auto_post_schedule` (id=1) tracks:
 //     last_post_date  -- the date (YYYY-MM-DD, Kathmandu-local) a post was last auto-generated
 //     next_run_at     -- the randomly chosen ISO timestamp within today's 4-5pm window, once picked
 //   On each cron tick inside the window:
-//     1. Skip if last_post_date was yesterday or today (i.e. not yet 2 days since last post).
-//     2. If eligible and next_run_at isn't set for today yet, pick a random time in the
-//        remaining window and store it (don't post yet).
-//     3. If eligible and now >= next_run_at, generate + send review email, and record today
-//        as last_post_date.
+//     1. Skip if a post was already generated today.
+//     2. If not yet generated today and next_run_at isn't set for today yet, pick a random
+//        time in the remaining window and store it (don't post yet).
+//     3. If next_run_at is set and now >= next_run_at, generate + send review email, and
+//        record today as last_post_date.
 
 const LINKEDIN_API_VERSION = '202506';
 
@@ -48,38 +48,6 @@ const ANGLES = [
   {
     key: 'client_value',
     brief: "Talk about the kind of problem Inferreach solves for clients and why it matters, without naming a specific real client unless one is provided. Frame it around the client's pain point, not a sales pitch.",
-  },
-  {
-    key: 'technical_deep_dive',
-    brief: 'Explain one specific technical concept relevant to data engineering or IT infrastructure (e.g. pipeline monitoring, data quality checks, orchestration tradeoffs) in a way a non-technical founder could still follow. Show expertise without jargon-dumping.',
-  },
-  {
-    key: 'mistake_or_failure',
-    brief: 'Describe a real or plausible mistake, wrong assumption, or failed approach in building software/data systems, and what it taught you. Vulnerability builds trust -- but stay in professional territory, not personal oversharing.',
-  },
-  {
-    key: 'contrarian_take',
-    brief: 'Challenge a common assumption or piece of "conventional wisdom" in software development, IT consulting, or startup tooling. Be specific about what people get wrong and why. Should spark disagreement or debate in the comments.',
-  },
-  {
-    key: 'cost_or_roi',
-    brief: 'Talk about the real cost of a common IT/data problem (downtime, bad data, technical debt, slow reporting) in terms a business decision-maker cares about -- time, money, missed opportunities. Avoid inventing specific numbers; use realistic ranges or scenarios instead.',
-  },
-  {
-    key: 'process_or_workflow',
-    brief: 'Walk through how Inferreach approaches a specific type of project or problem (e.g. auditing a client\'s existing pipeline, onboarding a new data source, diagnosing a broken dashboard) as a mini case-study-style narrative, without naming a real client.',
-  },
-  {
-    key: 'trend_prediction',
-    brief: 'Make a specific, falsifiable prediction about where IT services, data infrastructure, or small-business tech adoption is headed in the next 1-2 years. Ground it in something observable now, not vague futurism.',
-  },
-  {
-    key: 'hiring_or_team',
-    brief: 'Share a perspective on what makes a good data engineer, IT consultant, or technical hire -- or a lesson about building/running a small technical team. Keep it grounded in practical experience, not generic leadership platitudes.',
-  },
-  {
-    key: 'tool_or_stack_opinion',
-    brief: 'Share a specific, opinionated take on a tool, platform, or approach commonly used in data engineering or IT infrastructure (e.g. when NOT to use a certain orchestrator, why a "boring" tool beats a trendy one for most companies). Should read as earned expertise, not a sponsored post.',
   },
 ];
 
@@ -136,12 +104,6 @@ function checkCron(request, env) {
 function kathmanduDateString(date) {
   const d = new Date(date.getTime() + KATHMANDU_OFFSET_MINUTES * 60 * 1000);
   return d.toISOString().slice(0, 10);
-}
-
-function daysBetween(dateStrA, dateStrB) {
-  const a = new Date(dateStrA + 'T00:00:00Z');
-  const b = new Date(dateStrB + 'T00:00:00Z');
-  return Math.round((b - a) / (24 * 60 * 60 * 1000));
 }
 
 // Picks a random UTC timestamp between now (or window start, whichever is later) and window end, for "today"
@@ -382,7 +344,7 @@ async function handlePublishDue(request, env) {
   return json(result);
 }
 
-// ---------- auto-generate scheduling gate (every-other-day, random 4-5pm Kathmandu) ----------
+// ---------- auto-generate scheduling gate (daily, random 4-5pm Kathmandu) ----------
 
 async function nextAngle(env) {
   const row = await env.DB.prepare('SELECT last_index FROM angle_rotation WHERE id = 1').first();
@@ -459,18 +421,15 @@ async function generateAndQueue(request, env) {
 }
 
 // Called on every cron tick that lands inside the 4-5pm Kathmandu window.
-// Handles the every-other-day gate + picks/waits for a random time within the window.
+// Ensures exactly one post gets generated per day, at a random time within the window.
 async function runAutoGenerateGate(request, env) {
   const now = new Date();
   const todayStr = kathmanduDateString(now);
   const state = await getScheduleState(env);
 
-  // Gate 1: every-other-day. Skip if we posted yesterday or already today.
-  if (state.last_post_date) {
-    const gap = daysBetween(state.last_post_date, todayStr);
-    if (gap < 2) {
-      return { skipped: true, reason: `last post was ${gap} day(s) ago, waiting for every-other-day gate`, last_post_date: state.last_post_date };
-    }
+  // Gate 1: daily. Skip if we've already generated a post today.
+  if (state.last_post_date === todayStr) {
+    return { skipped: true, reason: 'already posted today', last_post_date: state.last_post_date };
   }
 
   // Gate 2: random time within window. If not yet picked for today, pick it and wait.
