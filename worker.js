@@ -25,7 +25,7 @@
 //     3. If next_run_at is set and now >= next_run_at, generate + send review email, and
 //        record today as last_post_date.
 
-const LINKEDIN_API_VERSION = '202506';
+const LINKEDIN_API_VERSION = '202607';
 
 // Kathmandu is UTC+5:45. The 4:00-5:00pm (16:00-17:00) local window is 10:15-11:15 UTC.
 const WINDOW_START_UTC_MINUTES = 10 * 60 + 15; // 10:15 UTC

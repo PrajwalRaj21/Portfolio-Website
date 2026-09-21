@@ -1,0 +1,25 @@
+name: Sync GitHub projects to D1
+
+on:
+  schedule:
+    - cron: '0 6 * * *'    # daily at 06:00 UTC
+  workflow_dispatch:        # manual trigger from Actions tab
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run sync
+        env:
+          GITHUB_USER:            ${{ vars.GH_USER }}
+          GITHUB_TOKEN:           ${{ secrets.GITHUB_TOKEN }}
+          CLOUDFLARE_API_TOKEN:   ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID:  ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_DATABASE_ID: ${{ secrets.CLOUDFLARE_DATABASE_ID }}
+        run: node scripts/sync-projects.mjs
